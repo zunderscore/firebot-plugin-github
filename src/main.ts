@@ -36,7 +36,7 @@ const processWebhook = ({ config, headers, payload }: { config: WebhookConfig, h
         return;
     }
 
-    const eventName = headers["x-github-event"];
+    const eventName = headers["x-github-event"].replace("_", "-");
     const fullEventName = `${eventName}-${payload.action}` as GitHubEventType;
 
     logDebug(`Webhook type: ${fullEventName}`);
