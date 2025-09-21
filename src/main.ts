@@ -14,7 +14,7 @@ import {
     PLUGIN_ID,
     PLUGIN_NAME,
     GITHUB_EVENT_SOURCE_ID,
-    GITHUB_RELEASE_PUBLISHED_EVENT_ID
+    GITHUB_RELEASE_RELEASED_EVENT_ID
 } from "./constants";
 
 const packageInfo = require("../package.json");
@@ -48,10 +48,10 @@ const processWebhook = ({ config, headers, payload }: { config: WebhookConfig, h
 
     switch (fullEventName as keyof webhooks)
     {
-        case GITHUB_RELEASE_PUBLISHED_EVENT_ID:
+        case "release-released":
             {
-                eventId = GITHUB_RELEASE_PUBLISHED_EVENT_ID;
-                const typedPayload = payload as GitHubWebhookEventDefinition<"release-published">;
+                eventId = GITHUB_RELEASE_RELEASED_EVENT_ID;
+                const typedPayload = payload as GitHubWebhookEventDefinition<"release-released">;
                 eventData = {
                     type: fullEventName,
                     ...baseEventData,

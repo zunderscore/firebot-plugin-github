@@ -19,7 +19,7 @@ This plugin adds support for GitHub events and related variables to Firebot.
 ## Events
 
 New events:
-- **GitHub: Release Published**
+- **GitHub: Release Released**
 
 ## Variables
 

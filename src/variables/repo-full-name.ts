@@ -3,7 +3,7 @@ import { GitHubRepoEventData } from "../github-types";
 import {
     VARIABLE_PREFIX,
     GITHUB_EVENT_SOURCE_ID,
-    GITHUB_RELEASE_PUBLISHED_EVENT_ID
+    GITHUB_RELEASE_RELEASED_EVENT_ID
 } from "../constants";
 
 export const RepoFullNameVariable: ReplaceVariable = {
@@ -14,7 +14,7 @@ export const RepoFullNameVariable: ReplaceVariable = {
         categories: [ "trigger based" ],
         triggers: {
             event: [
-                `${GITHUB_EVENT_SOURCE_ID}:${GITHUB_RELEASE_PUBLISHED_EVENT_ID}`
+                `${GITHUB_EVENT_SOURCE_ID}:${GITHUB_RELEASE_RELEASED_EVENT_ID}`
             ],
             manual: true
         }

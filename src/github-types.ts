@@ -1,7 +1,7 @@
 import { webhooks } from "@octokit/openapi-webhooks-types";
 
 export type GitHubEventType = 
-    | "release-published";
+    | "release-released";
 
 type GitHubEventDataBase = {
     type: GitHubEventType
@@ -13,14 +13,14 @@ export type GitHubRepoEventData = {
     repoUrl: string;
 }
 
-export type GitHubReleasePublishedEventData = GitHubEventDataBase &
+export type GitHubReleaseReleasedEventData = GitHubEventDataBase &
     GitHubRepoEventData & {
-    type: "release-published",
+    type: "release-released",
     releaseVersion: string;
 }
 
 export type GitHubEventData = 
-    | GitHubReleasePublishedEventData
+    | GitHubReleaseReleasedEventData
 
 // Borrowed partially from 
 
