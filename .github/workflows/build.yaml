@@ -17,6 +17,7 @@ jobs:
 
     outputs:
       version: ${{ steps.set_output.outputs.version }}
+      pluginname: ${{ steps.set_output.outputs.pluginname }}
 
     steps:
       - uses: actions/checkout@v4
@@ -41,7 +42,9 @@ jobs:
 
       - name: Set Output
         id: set_output
-        run: echo "version=$PackageVersion" >> $GITHUB_OUTPUT
+        run: |
+          echo "version=$PackageVersion" >> $GITHUB_OUTPUT &&
+          echo "pluginname=$PluginName" >> $GITHUB_OUTPUT
 
   build:
     name: Build plugin
@@ -65,8 +68,8 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: $PluginName Release
-          path: ./dist/$PluginName.js
+          name: ${{ needs.checktag.outputs.version }} Release
+          path: ./dist/${{ needs.checktag.outputs.version }}.js
 
   release:
     name: Draft Release
@@ -77,7 +80,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v5
         with:
-          name: $PluginName Release
+          name: $${{ needs.checktag.outputs.pluginname }} Release
           path: ./artifacts/
 
       - name: Draft Release
@@ -92,4 +95,4 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            ./artifacts/$PluginName.js
+            ./artifacts/${{ needs.checktag.outputs.pluginname }}.js
