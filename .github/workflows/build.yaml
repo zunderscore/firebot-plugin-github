@@ -80,7 +80,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v5
         with:
-          name: $${{ needs.checktag.outputs.pluginname }} Release
+          name: ${{ needs.checktag.outputs.version }} Release
           path: ./artifacts/
 
       - name: Draft Release
