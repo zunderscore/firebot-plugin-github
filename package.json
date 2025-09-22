@@ -1,7 +1,7 @@
 {
   "name": "firebot-plugin-github",
   "scriptOutputName": "firebot-github",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A GitHub plugin for Firebot",
   "main": "",
   "scripts": {
@@ -14,6 +14,7 @@
   "license": "MIT",
   "devDependencies": {
     "@crowbartools/firebot-custom-scripts-types": "github:crowbartools/firebot-custom-scripts-types#6382b7e120346b4b070db5e72060268187e19ace",
+    "@octokit/openapi-webhooks-types": "^12.0.3",
     "jest": "^30.1.3",
     "node-cache": "^4.2.1",
     "terser-webpack-plugin": "^5.3.14",
@@ -24,6 +25,6 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "@octokit/openapi-webhooks-types": "^12.0.3"
+    "@octokit/webhooks": "^14.1.3"
   }
 }

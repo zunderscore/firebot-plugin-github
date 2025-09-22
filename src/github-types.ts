@@ -1,28 +1,84 @@
-import { webhooks } from "@octokit/openapi-webhooks-types";
-
 export type GitHubEventType = 
-    | "release-released";
+    | "unknown"
+    | "release-created"
+    | "release-deleted"
+    | "release-published"
+    | "release-prereleased"
+    | "release-released"
 
-type GitHubEventDataBase = {
-    type: GitHubEventType
+// Shared Types
+
+export type GitHubBaseEventData = {
+    type: GitHubEventType;
 }
 
-export type GitHubRepoEventData = {
-    repoName: string;
-    repoFullName: string;
-    repoUrl: string;
+export type GitHubUser = {
+    username: string;
+    userId: number;
+    profileUrl: string;
+    avatarUrl: string;
 }
 
-export type GitHubReleaseReleasedEventData = GitHubEventDataBase &
-    GitHubRepoEventData & {
-    type: "release-released",
-    releaseVersion: string;
+export type GitHubOrganization = {
+    name: string;
+    description: string;
+    url: string;
+    avatarUrl: string;
 }
+
+export type GitHubRepo = {
+    name: string;
+    fullName: string;
+    url: string;
+}
+
+export type GitHubRelease = {
+    version: string;
+    url: string;
+}
+
+// Releases
+
+export type GitHubReleaseEventData = GitHubBaseEventData & {
+    user: GitHubUser;
+    org: GitHubOrganization;
+    repo: GitHubRepo;
+    release: GitHubRelease;
+}
+
+type GitHubReleaseCreatedEventData = GitHubReleaseEventData & {
+    type: "release-created";
+}
+
+type GitHubReleaseDeletedEventData = GitHubReleaseEventData & {
+    type: "release-deleted";
+}
+
+type GitHubReleasePublishedEventData = GitHubReleaseEventData & {
+    type: "release-published";
+}
+
+type GitHubReleasePrereleasedEventData = GitHubReleaseEventData & {
+    type: "release-prereleased";
+}
+
+type GitHubReleaseReleasedEventData = GitHubReleaseEventData & {
+    type: "release-released";
+}
+
+// Unknown event
+
+export type GitHubUnknownEventData = {
+    type: "unknown";
+    rawData: any;
+}
+
+// Final export
 
 export type GitHubEventData = 
+    | GitHubUnknownEventData
+    | GitHubReleaseCreatedEventData
+    | GitHubReleaseDeletedEventData
+    | GitHubReleasePrereleasedEventData
+    | GitHubReleasePublishedEventData
     | GitHubReleaseReleasedEventData
-
-// Borrowed partially from 
-
-export type GitHubWebhookEventDefinition<TEventName extends keyof webhooks> =
-  webhooks[TEventName]["post"]["requestBody"]["content"]["application/json"];

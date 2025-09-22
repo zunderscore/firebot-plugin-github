@@ -3,18 +3,19 @@ import { Logger } from "@crowbartools/firebot-custom-scripts-types/types/modules
 import { EventManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-manager";
 import { ReplaceVariableManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
 import { WebhookConfig, WebhookManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/webhook-manager";
-import { webhooks } from "@octokit/openapi-webhooks-types";
+import { EmitterWebhookEvent } from "@octokit/webhooks";
+
+import { GitHubEventData } from "./github-types";
+import { githubEventHandler, githubEvents } from "./webhook-processor";
 
 import { GitHubEventSource } from "./events";
 import { GitHubVariables } from "./variables";
 
-import { GitHubEventData, GitHubEventType, GitHubWebhookEventDefinition } from "./github-types";
 
 import {
     PLUGIN_ID,
     PLUGIN_NAME,
-    GITHUB_EVENT_SOURCE_ID,
-    GITHUB_RELEASE_RELEASED_EVENT_ID
+    GITHUB_EVENT_SOURCE_ID
 } from "./constants";
 
 const packageInfo = require("../package.json");
@@ -23,6 +24,8 @@ let logger: Logger;
 let eventManager: EventManager;
 let replaceVariableManager: ReplaceVariableManager;
 let webhookManager: WebhookManager;
+
+let writeDebugOnUnknown = false;
 
 const logDebug = (msg: string, ...meta: any[]) => logger.debug(`[${PLUGIN_NAME}] ${msg}`, ...meta);
 const logInfo = (msg: string, ...meta: any[]) => logger.info(`[${PLUGIN_NAME}] ${msg}`, ...meta);
@@ -37,42 +40,50 @@ const processWebhook = ({ config, headers, payload }: { config: WebhookConfig, h
     }
 
     const eventName = headers["x-github-event"].replace("_", "-");
-    const fullEventName = `${eventName}-${payload.action}` as GitHubEventType;
+    let fullEventName = eventName;
+    if (payload.action) {
+        fullEventName = `${eventName}-${payload.action}`;
+    }
 
     logDebug(`Webhook type: ${fullEventName}`);
 
-    let eventId: string, eventData: GitHubEventData;
-    const baseEventData = {
-        type: fullEventName
-    };
+    githubEventHandler.receive({
+        id: headers["x-github-delivery"],
+        name: headers["x-github-event"] as any,
+        payload
+    });
+}
 
-    switch (fullEventName as keyof webhooks)
-    {
-        case "release-released":
-            {
-                eventId = GITHUB_RELEASE_RELEASED_EVENT_ID;
-                const typedPayload = payload as GitHubWebhookEventDefinition<"release-released">;
-                eventData = {
-                    type: fullEventName,
-                    ...baseEventData,
-                    repoName: typedPayload.repository.name,
-                    repoFullName: typedPayload.repository.full_name,
-                    repoUrl: typedPayload.repository.html_url,
-                    releaseVersion: typedPayload.release.tag_name
-                };
-            }
-            break;
+const triggerWebhookEvent = ({ eventData }: { eventData: GitHubEventData }) => {
+    eventManager.triggerEvent(GITHUB_EVENT_SOURCE_ID, eventData.type, eventData);
+}
 
-        default:
-            logWarn(`Unknown event type ${fullEventName}. Skipping.`);
-            break;
+function setupWebhookListeners() {
+    for (const event of githubEvents) {
+        logDebug(`Registering webhook event ${event}`);
+        githubEventHandler.on(event, triggerWebhookEvent);
     }
 
-    eventManager.triggerEvent(GITHUB_EVENT_SOURCE_ID, eventId, eventData);
+    githubEventHandler.onAny((event: EmitterWebhookEvent & { eventData: GitHubEventData }) => {
+        if (event.eventData.type == "unknown") {
+            logWarn(`Unknown event type received. Skipping.`);
+            if (writeDebugOnUnknown) {
+                logDebug("Unknown event data", event.eventData.rawData);
+            }
+        }
+    })
+}
+
+function removeWebhookListeners() {
+    for (const event of githubEvents) {
+        logDebug(`Unregistering webhook event ${event}`);
+        githubEventHandler.removeListener(event, triggerWebhookEvent);
+    }
 }
 
 const script: Firebot.CustomScript<{
     copyWebhookUrl: void;
+    writeDebugOnUnknown: boolean;
 }> = {
     getScriptManifest: () => ({
         name: PLUGIN_NAME,
@@ -92,10 +103,20 @@ const script: Firebot.CustomScript<{
             buttonText: "Copy URL",
             icon: "fa-copy",
             sync: true
+        },
+        writeDebugOnUnknown: {
+            type: "boolean",
+            title: "Log Raw Data for Unknown Events",
+            description: "When an unknown event is received, log the raw data received from the GitHub event. Firebot debug logs must be enabled for this to take effect.",
+            default: false
         }
     }),
-    run: ({ modules }) => {
+    parametersUpdated: (params) => {
+        ({ writeDebugOnUnknown } = params);
+    },
+    run: ({ modules, parameters }) => {
         ({ logger, eventManager, replaceVariableManager, webhookManager } = modules);
+        ({ writeDebugOnUnknown } = parameters);
 
         logInfo(`Starting ${PLUGIN_NAME} plugin...`);
 
@@ -112,7 +133,7 @@ const script: Firebot.CustomScript<{
             replaceVariableManager.registerReplaceVariable(variable);
         }
 
-        logDebug("Registering frontend listener");
+        logDebug("Registering frontend listener...");
         const frontendCommunicator = modules.frontendCommunicator;
         frontendCommunicator.on(`${PLUGIN_ID}:copy-webhook-url`, () => {
             frontendCommunicator.send("copy-to-clipboard", { 
@@ -122,6 +143,7 @@ const script: Firebot.CustomScript<{
 
 
         logDebug("Registering webhook listener...");
+        setupWebhookListeners();
         webhookManager.on("webhook-received", processWebhook);
 
         logDebug("Checking for webhook...");
@@ -142,10 +164,11 @@ const script: Firebot.CustomScript<{
         logInfo("Plugin ready. Listening for events.");
     },
     stop: (uninstalling: boolean) => {
-        logDebug(`Stopping ${PLUGIN_NAME} plugin`);
+        logDebug(`Stopping ${PLUGIN_NAME} plugin...`);
 
-        logDebug("Stopping webhook listener");
+        logDebug("Stopping webhook listener...");
         webhookManager.removeListener("webhook-received", processWebhook);
+        removeWebhookListeners();
 
         if (uninstalling === true) {
             logDebug("Removing webhook...");

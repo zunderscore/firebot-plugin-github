@@ -1,11 +1,11 @@
-import { RepoFullNameVariable } from "./repo-full-name";
-import { RepoNameVariable } from "./repo-name";
-import { RepoUrlVariable } from "./repo-url";
-import { ReleaseVersionVariable } from "./release-version";
+import { RepoVariables } from "./repos";
+import { ReleaseVariables } from "./releases";
+import { UserVariables } from "./users";
+import { OrganizationVariables } from "./orgs";
 
 export const GitHubVariables = [
-    ReleaseVersionVariable,
-    RepoFullNameVariable,
-    RepoNameVariable,
-    RepoUrlVariable
+    ...OrganizationVariables,
+    ...ReleaseVariables,
+    ...RepoVariables,
+    ...UserVariables
 ];
