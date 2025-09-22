@@ -20,7 +20,7 @@ jobs:
       pluginname: ${{ steps.set_output.outputs.pluginname }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Get version
         run: |
@@ -32,7 +32,7 @@ jobs:
 
       - name: Check for corresponding git tag
         id: tag_check
-        uses: mukunku/tag-exists-action@v1.2.0
+        uses: mukunku/tag-exists-action@v1.6.0
         with:
           tag: "$PackageVersion"
 
@@ -68,7 +68,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ needs.checktag.outputs.version }} Release
+          name: ${{ needs.checktag.outputs.pluginname }} Release
           path: ./dist/${{ needs.checktag.outputs.pluginname }}.js
 
   release:
@@ -80,7 +80,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v5
         with:
-          name: ${{ needs.checktag.outputs.version }} Release
+          name: ${{ needs.checktag.outputs.pluginname }} Release
           path: ./artifacts/
 
       - name: Draft Release
