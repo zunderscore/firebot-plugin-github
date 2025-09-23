@@ -1,5 +1,5 @@
 import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
-import { GitHubUser } from "../../github-types";
+import { GitHubRepo } from "../../github-types";
 import {
     VARIABLE_PREFIX,
     GITHUB_EVENT_SOURCE_ID,
@@ -8,10 +8,10 @@ import {
 } from "../../constants";
 import { getEventsMatchingPrefix } from "../../events";
 
-export const ProfileUrlVariable: ReplaceVariable = {
+export const RepoIsForkVariable: ReplaceVariable = {
     definition: {
-        handle: `${VARIABLE_PREFIX}ProfileUrl`,
-        description: "The GitHub user profile URL.",
+        handle: `${VARIABLE_PREFIX}RepoIsFork`,
+        description: "`true` if the GitHub repo is a fork of another repo, or `false` otherwise.",
         possibleDataOutput: [ "text" ],
         categories: [ "trigger based" ],
         triggers: {
@@ -25,6 +25,6 @@ export const ProfileUrlVariable: ReplaceVariable = {
         }
     },
     evaluator: async (trigger) => {
-        return (trigger.metadata?.eventData?.user as GitHubUser)?.profileUrl ?? "";
+        return (trigger.metadata?.eventData?.repo as GitHubRepo)?.isFork ?? false;
     }
 };

@@ -17,6 +17,6 @@ export const ReleaseUrlVariable: ReplaceVariable = {
         }
     },
     evaluator: async (trigger) => {
-        return (trigger.metadata?.eventData?.release as GitHubRelease)?.url;
+        return (trigger.metadata?.eventData?.release as GitHubRelease)?.url ?? "";
     }
 };

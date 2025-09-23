@@ -1,6 +1,11 @@
 import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
 import { GitHubRepo } from "../../github-types";
-import { VARIABLE_PREFIX } from "../../constants";
+import {
+    VARIABLE_PREFIX,
+    GITHUB_EVENT_SOURCE_ID,
+    GITHUB_FORKED_EVENT_ID,
+    GITHUB_STARRED_EVENT_ID,
+} from "../../constants";
 import { getEventsMatchingPrefix } from "../../events";
 
 export const RepoFullNameVariable: ReplaceVariable = {
@@ -11,16 +16,15 @@ export const RepoFullNameVariable: ReplaceVariable = {
         categories: [ "trigger based" ],
         triggers: {
             event: [
-                ...getEventsMatchingPrefix("release-")
+                ...getEventsMatchingPrefix("pull-request-"),
+                ...getEventsMatchingPrefix("release-"),
+                `${GITHUB_EVENT_SOURCE_ID}:${GITHUB_FORKED_EVENT_ID}`,
+                `${GITHUB_EVENT_SOURCE_ID}:${GITHUB_STARRED_EVENT_ID}`
             ],
             manual: true
         }
     },
     evaluator: async (trigger) => {
-        return (trigger.metadata?.eventData?.repo as GitHubRepo)?.fullName;
+        return (trigger.metadata?.eventData?.repo as GitHubRepo)?.fullName ?? "";
     }
 };
-
-function getEventIdsWithPrefix(arg0: string) {
-    throw new Error("Function not implemented.");
-}

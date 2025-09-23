@@ -1,0 +1,25 @@
+import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
+import { GitHubRepo } from "../../github-types";
+import {
+    VARIABLE_PREFIX,
+    GITHUB_EVENT_SOURCE_ID,
+    GITHUB_FORKED_EVENT_ID,
+} from "../../constants";
+
+export const ForkRepoFullNameVariable: ReplaceVariable = {
+    definition: {
+        handle: `${VARIABLE_PREFIX}ForkRepoFullName`,
+        description: "The full name of the new fork GitHub repo (e.g. `zunderscore/Firebot`).",
+        possibleDataOutput: [ "text" ],
+        categories: [ "trigger based" ],
+        triggers: {
+            event: [
+                `${GITHUB_EVENT_SOURCE_ID}:${GITHUB_FORKED_EVENT_ID}`
+            ],
+            manual: true
+        }
+    },
+    evaluator: async (trigger) => {
+        return (trigger.metadata?.eventData?.forkedRepo as GitHubRepo)?.fullName ?? "";
+    }
+};

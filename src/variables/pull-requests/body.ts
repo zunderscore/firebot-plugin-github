@@ -1,22 +1,22 @@
 import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
-import { GitHubRelease } from "../../github-types";
+import { GitHubPullRequest } from "../../github-types";
 import { VARIABLE_PREFIX } from "../../constants";
 import { getEventsMatchingPrefix } from "../../events";
 
-export const ReleaseVersionVariable: ReplaceVariable = {
+export const PullRequestBodyVariable: ReplaceVariable = {
     definition: {
-        handle: `${VARIABLE_PREFIX}ReleaseVersion`,
-        description: "The version/tag name of the GitHub release.",
+        handle: `${VARIABLE_PREFIX}PullRequestBody`,
+        description: "The body of the GitHub pull request.",
         possibleDataOutput: [ "text" ],
         categories: [ "trigger based" ],
         triggers: {
             event: [
-                ...getEventsMatchingPrefix("release-")
+                ...getEventsMatchingPrefix("pull-request-")
             ],
             manual: true
         }
     },
     evaluator: async (trigger) => {
-        return (trigger.metadata?.eventData?.release as GitHubRelease)?.version ?? "";
+        return (trigger.metadata?.eventData?.pullRequest as GitHubPullRequest)?.body ?? "";
     }
 };

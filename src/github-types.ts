@@ -1,10 +1,14 @@
 export type GitHubEventType = 
     | "unknown"
+    | "forked"
+    | "pull-request-opened"
+    | "pull-request-closed"
     | "release-created"
     | "release-deleted"
     | "release-published"
     | "release-prereleased"
     | "release-released"
+    | "starred"
 
 // Shared Types
 
@@ -12,11 +16,12 @@ export type GitHubBaseEventData = {
     type: GitHubEventType;
 }
 
-export type GitHubUser = {
-    username: string;
-    userId: number;
-    profileUrl: string;
-    avatarUrl: string;
+export type GitHubMergeBase = {
+    label: string;
+    ref: string;
+    repo: GitHubRepo;
+    sha: string;
+    user: GitHubUser;
 }
 
 export type GitHubOrganization = {
@@ -26,15 +31,66 @@ export type GitHubOrganization = {
     avatarUrl: string;
 }
 
-export type GitHubRepo = {
-    name: string;
-    fullName: string;
+export type GitHubPullRequest = {
+    number: number;
+    title: string;
+    body: string;
     url: string;
+    createdAt: Date;
+    assignee: GitHubUser;
+    merged: boolean;
+    mergedAt?: Date;
+    mergedBy?: GitHubUser;
+    base: GitHubMergeBase;
+    head: GitHubMergeBase;
 }
 
 export type GitHubRelease = {
     version: string;
     url: string;
+}
+
+export type GitHubRepo = {
+    name: string;
+    fullName: string;
+    url: string;
+    forks: number;
+    stars: number;
+    isFork: boolean;
+}
+
+export type GitHubUser = {
+    username: string;
+    userId: number;
+    profileUrl: string;
+    avatarUrl: string;
+}
+
+// Forks
+
+type GitHubForkedEventData = GitHubBaseEventData & {
+    type: "forked",
+    user: GitHubUser;
+    org: GitHubOrganization;
+    repo: GitHubRepo;
+    forkedRepo: GitHubRepo;
+}
+
+// Pull Requests
+
+export type GitHubPullRequestEventData = GitHubBaseEventData & {
+    user: GitHubUser;
+    org: GitHubOrganization;
+    repo: GitHubRepo;
+    pullRequest: GitHubPullRequest;
+}
+
+type GitHubPullRequestOpenedEventData = GitHubPullRequestEventData & {
+    type: "pull-request-opened";
+}
+
+type GitHubPullRequestClosedEventData = GitHubPullRequestEventData & {
+    type: "pull-request-closed";
 }
 
 // Releases
@@ -66,6 +122,19 @@ type GitHubReleaseReleasedEventData = GitHubReleaseEventData & {
     type: "release-released";
 }
 
+// Stars
+
+export type GitHubStar = GitHubBaseEventData & {
+    user: GitHubUser;
+    org: GitHubOrganization;
+    repo: GitHubRepo;
+    starredAt: Date;
+}
+
+type GitHubStarCreatedEventData = GitHubStar & {
+    type: "starred";
+}
+
 // Unknown event
 
 export type GitHubUnknownEventData = {
@@ -77,8 +146,12 @@ export type GitHubUnknownEventData = {
 
 export type GitHubEventData = 
     | GitHubUnknownEventData
+    | GitHubForkedEventData
+    | GitHubPullRequestOpenedEventData
+    | GitHubPullRequestClosedEventData
     | GitHubReleaseCreatedEventData
     | GitHubReleaseDeletedEventData
     | GitHubReleasePrereleasedEventData
     | GitHubReleasePublishedEventData
     | GitHubReleaseReleasedEventData
+    | GitHubStarCreatedEventData

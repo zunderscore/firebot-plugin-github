@@ -19,24 +19,40 @@ This plugin adds support for GitHub events and related variables to Firebot.
 ## Events
 
 New events:
+- **GitHub: Pull Request Opened**
+- **GitHub: Pull Request Closed**
 - **GitHub: Release Created**
 - **GitHub: Release Deleted**
 - **GitHub: Release Prereleased**
 - **GitHub: Release Published**
 - **GitHub: Release Released**
+- **GitHub: Repo Forked**
+- **GitHub: Repo Starred**
 
 ## Variables
 
 New variables:
+- `$githubForkRepoFullName`
+- `$githubForkRepoName`
+- `$githubForkRepoUrl`
 - `$githubOrgAvatarUrl`
 - `$githubOrgDescription`
 - `$githubOrgName`
 - `$githubOrgUrl`
+- `$githubPullRequestBody`
+- `$githubPullRequestMerged`
+- `$githubPullRequestNumber`
+- `$githubPullRequestTitle`
+- `$githubPullRequestUrl`
 - `$githubReleaseUrl`
 - `$githubReleaseVersion`
+- `$githubRepoForks`
 - `$githubRepoFullName`
+- `$githubRepoIsFork`
 - `$githubRepoName`
+- `$githubRepoStars`
 - `$githubRepoUrl`
+- `$githubStarredAt`
 - `$githubUserAvatarUrl`
 - `$githubUserId`
 - `$githubUsername`

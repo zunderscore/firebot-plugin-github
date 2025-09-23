@@ -2,17 +2,39 @@ import { EventSource } from "@crowbartools/firebot-custom-scripts-types/types/mo
 import {
     PLUGIN_NAME,
     GITHUB_EVENT_SOURCE_ID,
+    GITHUB_FORKED_EVENT_ID,
+    GITHUB_PULL_REQUEST_OPENED_EVENT_ID,
+    GITHUB_PULL_REQUEST_CLOSED_EVENT_ID,
     GITHUB_RELEASE_CREATED_EVENT_ID,
     GITHUB_RELEASE_DELETED_EVENT_ID,
     GITHUB_RELEASE_PRERELEASED_EVENT_ID,
     GITHUB_RELEASE_PUBLISHED_EVENT_ID,
     GITHUB_RELEASE_RELEASED_EVENT_ID,
+    GITHUB_STARRED_EVENT_ID,
 } from "../constants";
 
 export const GitHubEventSource: EventSource = {
     id: GITHUB_EVENT_SOURCE_ID,
     name: PLUGIN_NAME,
     events: [
+        // Forks
+        {
+            id: GITHUB_FORKED_EVENT_ID,
+            name: `${PLUGIN_NAME}: Repo Forked`,
+            description: "A GitHub repo was forked"
+        },
+
+        // Pull Requests
+        {
+            id: GITHUB_PULL_REQUEST_OPENED_EVENT_ID,
+            name: `${PLUGIN_NAME}: Pull Request Opened`,
+            description: "A GitHub pull request was created"
+        },
+        {
+            id: GITHUB_PULL_REQUEST_CLOSED_EVENT_ID,
+            name: `${PLUGIN_NAME}: Pull Request Closed`,
+            description: "A GitHub pull request was either merged or closed without being merged"
+        },
 
         // Releases
         {
@@ -39,6 +61,13 @@ export const GitHubEventSource: EventSource = {
             id: GITHUB_RELEASE_RELEASED_EVENT_ID,
             name: `${PLUGIN_NAME}: Release Released`,
             description: "A GitHub release was published, or a pre-release was changed to a release"
+        },
+
+        // Stars
+        {
+            id: GITHUB_STARRED_EVENT_ID,
+            name: `${PLUGIN_NAME}: Repo Starred`,
+            description: "When someone stars a GitHub repo"
         },
     ]
 }
