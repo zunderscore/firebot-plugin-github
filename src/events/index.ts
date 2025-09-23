@@ -3,6 +3,7 @@ import {
     PLUGIN_NAME,
     GITHUB_EVENT_SOURCE_ID,
     GITHUB_FORKED_EVENT_ID,
+    GITHUB_PING_EVENT_ID,
     GITHUB_PULL_REQUEST_OPENED_EVENT_ID,
     GITHUB_PULL_REQUEST_CLOSED_EVENT_ID,
     GITHUB_RELEASE_CREATED_EVENT_ID,
@@ -23,6 +24,14 @@ export const GitHubEventSource: EventSource = {
             name: `${PLUGIN_NAME}: Repo Forked`,
             description: "A GitHub repo was forked"
         },
+
+        // PING?
+        {
+            id: GITHUB_PING_EVENT_ID,
+            name: `${PLUGIN_NAME}: Ping`,
+            description: "A test message sent when a GitHub webhook is created"
+        },
+        // PONG!
 
         // Pull Requests
         {

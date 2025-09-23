@@ -1,6 +1,7 @@
 export type GitHubEventType = 
     | "unknown"
     | "forked"
+    | "ping"
     | "pull-request-opened"
     | "pull-request-closed"
     | "release-created"
@@ -66,6 +67,13 @@ export type GitHubUser = {
     avatarUrl: string;
 }
 
+export type GitHubWebhook = {
+    id: number;
+    name: string;
+    active: boolean;
+    events: string[];
+}
+
 // Forks
 
 type GitHubForkedEventData = GitHubBaseEventData & {
@@ -74,6 +82,17 @@ type GitHubForkedEventData = GitHubBaseEventData & {
     org: GitHubOrganization;
     repo: GitHubRepo;
     forkedRepo: GitHubRepo;
+}
+
+// Ping
+
+type GitHubPingEventData = GitHubBaseEventData & {
+    type: "ping",
+    user: GitHubUser;
+    org: GitHubOrganization;
+    repo: GitHubRepo;
+    webhook: GitHubWebhook;
+    zen: string;
 }
 
 // Pull Requests
@@ -147,6 +166,7 @@ export type GitHubUnknownEventData = {
 export type GitHubEventData = 
     | GitHubUnknownEventData
     | GitHubForkedEventData
+    | GitHubPingEventData
     | GitHubPullRequestOpenedEventData
     | GitHubPullRequestClosedEventData
     | GitHubReleaseCreatedEventData

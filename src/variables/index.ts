@@ -5,6 +5,7 @@ import { ReleaseVariables } from "./releases";
 import { RepoVariables } from "./repos";
 import { StarVariables } from "./stars";
 import { UserVariables } from "./users";
+import { WebhookVariables } from "./webhooks";
 
 export const GitHubVariables = [
     ...ForkVariables,
@@ -13,5 +14,6 @@ export const GitHubVariables = [
     ...ReleaseVariables,
     ...RepoVariables,
     ...StarVariables,
-    ...UserVariables
+    ...UserVariables,
+    ...WebhookVariables
 ];

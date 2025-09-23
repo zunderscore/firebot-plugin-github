@@ -19,6 +19,7 @@ This plugin adds support for GitHub events and related variables to Firebot.
 ## Events
 
 New events:
+- **GitHub: Ping**
 - **GitHub: Pull Request Opened**
 - **GitHub: Pull Request Closed**
 - **GitHub: Release Created**
@@ -57,3 +58,7 @@ New variables:
 - `$githubUserId`
 - `$githubUsername`
 - `$githubUserProfileUrl`
+- `$githubWebhookEvents`
+- `$githubWebhookId`
+- `$githubWebhookIsActive`
+- `$githubWebhookName`

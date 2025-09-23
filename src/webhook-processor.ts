@@ -8,6 +8,7 @@ import {
     GitHubRelease,
     GitHubRepo,
     GitHubUser,
+    GitHubWebhook,
 } from "./github-types";
 
 import {
@@ -25,16 +26,16 @@ function createUnknownEvent(event: any): GitHubUnknownEventData {
     return {
         type: "unknown",
         rawData: event
-    }
+    };
 }
 
 function getOrganizationInfo(org: components["schemas"]["organization-simple-webhooks"]): GitHubOrganization {
     return {
         name: org?.login,
         description: org?.description,
-        url: org?.url,
+        url: org?.login ? `https://github.com/${org.login}` : undefined,
         avatarUrl: org?.avatar_url
-    }
+    };
 }
 
 function getPullRequestInfo(pr: components["schemas"]["pull-request"]): GitHubPullRequest {
@@ -62,14 +63,14 @@ function getPullRequestInfo(pr: components["schemas"]["pull-request"]): GitHubPu
             sha: pr?.head?.sha,
             user: pr?.head?.user ? getUserInfo(pr.head.user) : undefined,
         } : undefined
-    }
+    };
 }
 
 function getReleaseInfo(release: components["schemas"]["webhooks_release"]): GitHubRelease {
     return {
         version: release?.tag_name,
         url: release?.html_url
-    }
+    };
 }
 
 function getRepoInfo(
@@ -94,6 +95,15 @@ function getUserInfo(user: components["schemas"]["simple-user"]): GitHubUser {
     };
 }
 
+function getWebhookInfo(hook: components["schemas"]["webhook-ping"]["hook"]): GitHubWebhook {
+    return {
+        id: hook?.id,
+        name: hook?.name,
+        active: hook?.active,
+        events: hook?.events
+    };
+}
+
 export const githubEventHandler = createEventHandler({
     async transform(event): Promise<{ eventData: GitHubEventData }> {
         let eventData: Partial<GitHubEventData> = createUnknownEvent(event);
@@ -107,6 +117,17 @@ export const githubEventHandler = createEventHandler({
                     repo: getRepoInfo(event.payload.repository),
                     forkedRepo: getRepoInfo(event.payload.forkee)
                 };
+                break;
+
+            case "ping":
+                eventData = {
+                    type: "ping",
+                    user: getUserInfo(event.payload.sender),
+                    org: getOrganizationInfo(event.payload.organization),
+                    repo: getRepoInfo(event.payload.repository),
+                    webhook: getWebhookInfo(event.payload.hook),
+                    zen: event.payload.zen
+                }
                 break;
 
             case "pull_request":
@@ -179,6 +200,7 @@ export const githubEventHandler = createEventHandler({
 
 export const githubEvents: EmitterWebhookEventName[] = [
     "fork",
+    "ping",
     "pull_request.closed",
     "pull_request.opened",
     "release.created",
