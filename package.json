@@ -13,7 +13,7 @@
   "author": "zunderscore",
   "license": "MIT",
   "devDependencies": {
-    "@crowbartools/firebot-custom-scripts-types": "github:crowbartools/firebot-custom-scripts-types#6382b7e120346b4b070db5e72060268187e19ace",
+    "@crowbartools/firebot-custom-scripts-types": "github:crowbartools/firebot-custom-scripts-types#521e14ec78cf7d2734f8e9b408dcd51eeba81d43",
     "@octokit/openapi-webhooks-types": "^12.0.3",
     "jest": "^30.1.3",
     "node-cache": "^4.2.1",

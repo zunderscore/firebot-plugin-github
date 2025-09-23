@@ -3,6 +3,7 @@ import { Logger } from "@crowbartools/firebot-custom-scripts-types/types/modules
 import { EventManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-manager";
 import { ReplaceVariableManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
 import { EventFilterManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-filter-manager";
+import { FrontendCommunicator } from "@crowbartools/firebot-custom-scripts-types/types/modules/frontend-communicator";
 import { WebhookConfig, WebhookManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/webhook-manager";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
 
@@ -25,9 +26,11 @@ let logger: Logger;
 let eventManager: EventManager;
 let replaceVariableManager: ReplaceVariableManager;
 let eventFilterManager: EventFilterManager;
+let frontendCommunicator: FrontendCommunicator;
 let webhookManager: WebhookManager;
 
 let writeDebugOnUnknown = false;
+let copyWebhookUrlEventId: string = undefined;
 
 const logDebug = (msg: string, ...meta: any[]) => logger.debug(`[${PLUGIN_NAME}] ${msg}`, ...meta);
 const logInfo = (msg: string, ...meta: any[]) => logger.info(`[${PLUGIN_NAME}] ${msg}`, ...meta);
@@ -118,7 +121,14 @@ const script: Firebot.CustomScript<{
         ({ writeDebugOnUnknown } = params);
     },
     run: ({ modules, parameters }) => {
-        ({ logger, eventManager, replaceVariableManager, eventFilterManager, webhookManager } = modules);
+        ({
+            logger,
+            eventManager,
+            replaceVariableManager,
+            eventFilterManager,
+            frontendCommunicator,
+            webhookManager
+        } = modules);
         ({ writeDebugOnUnknown } = parameters);
 
         logInfo(`Starting ${PLUGIN_NAME} plugin...`);
@@ -142,13 +152,12 @@ const script: Firebot.CustomScript<{
         }
 
         logDebug("Registering frontend listener...");
-        const frontendCommunicator = modules.frontendCommunicator;
-        frontendCommunicator.on(`${PLUGIN_ID}:copy-webhook-url`, () => {
+        copyWebhookUrlEventId = frontendCommunicator.on(`${PLUGIN_ID}:copy-webhook-url`, () => {
             frontendCommunicator.send("copy-to-clipboard", { 
                 text: webhookManager.getWebhookUrl(PLUGIN_NAME),
             });
         });
-
+        
 
         logDebug("Registering webhook listener...");
         setupWebhookListeners();
@@ -177,6 +186,22 @@ const script: Firebot.CustomScript<{
         logDebug("Stopping webhook listener...");
         webhookManager.removeListener("webhook-received", processWebhook);
         removeWebhookListeners();
+
+        logDebug("Unregistering frontend listener...");
+        frontendCommunicator.off(`${PLUGIN_ID}:copy-webhook-url`, copyWebhookUrlEventId);
+
+        logDebug("Unregistering filters...");
+        for (const filter of GitHubFilters) {
+            eventFilterManager.unregisterFilter(filter.id);
+        }
+
+        logDebug("Unregistering variables...");
+        for (const variable of GitHubVariables) {
+            replaceVariableManager.unregisterReplaceVariable(variable.definition.handle);
+        }
+
+        logDebug("Unregistering events...");
+        eventManager.unregisterEventSource(GITHUB_EVENT_SOURCE_ID);
 
         if (uninstalling === true) {
             logDebug("Removing webhook...");
