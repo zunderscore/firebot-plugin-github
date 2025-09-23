@@ -1,6 +1,7 @@
 export const PLUGIN_NAME = "GitHub";
 export const PLUGIN_ID = "github";
 export const VARIABLE_PREFIX = PLUGIN_ID;
+export const FILTER_PREFIX = PLUGIN_ID;
 
 export const GITHUB_EVENT_SOURCE_ID = PLUGIN_ID;
 

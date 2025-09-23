@@ -1,4 +1,5 @@
 import { EventSource } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-manager";
+import { FilterEvent } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-filter-manager";
 import {
     PLUGIN_NAME,
     GITHUB_EVENT_SOURCE_ID,
@@ -84,8 +85,18 @@ export const GitHubEventSource: EventSource = {
 export function getEventsMatchingPrefix(prefix: string): string[] {
     return GitHubEventSource.events.reduce((out, e) => {
         if (e.id.startsWith(prefix)) {
-            out.push(`${GITHUB_EVENT_SOURCE_ID}:${e.id}`)
+            out.push(`${GITHUB_EVENT_SOURCE_ID}:${e.id}`);
         }
         return out;
     }, [] as string[]);
+}
+
+
+export function getEventFiltersMatchingPrefix(prefix: string): FilterEvent[] {
+    return GitHubEventSource.events.reduce((out, e) => {
+        if (e.id.startsWith(prefix)) {
+            out.push({ eventSourceId: GITHUB_EVENT_SOURCE_ID, eventId: e.id });
+        }
+        return out;
+    }, [] as FilterEvent[]);
 }

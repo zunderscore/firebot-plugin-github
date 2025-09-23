@@ -2,6 +2,7 @@ import { Firebot } from "@crowbartools/firebot-custom-scripts-types";
 import { Logger } from "@crowbartools/firebot-custom-scripts-types/types/modules/logger";
 import { EventManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-manager";
 import { ReplaceVariableManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
+import { EventFilterManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-filter-manager";
 import { WebhookConfig, WebhookManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/webhook-manager";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
 
@@ -10,7 +11,7 @@ import { githubEventHandler, githubEvents } from "./webhook-processor";
 
 import { GitHubEventSource } from "./events";
 import { GitHubVariables } from "./variables";
-
+import { GitHubFilters } from "./filters";
 
 import {
     PLUGIN_ID,
@@ -23,6 +24,7 @@ const packageInfo = require("../package.json");
 let logger: Logger;
 let eventManager: EventManager;
 let replaceVariableManager: ReplaceVariableManager;
+let eventFilterManager: EventFilterManager;
 let webhookManager: WebhookManager;
 
 let writeDebugOnUnknown = false;
@@ -116,7 +118,7 @@ const script: Firebot.CustomScript<{
         ({ writeDebugOnUnknown } = params);
     },
     run: ({ modules, parameters }) => {
-        ({ logger, eventManager, replaceVariableManager, webhookManager } = modules);
+        ({ logger, eventManager, replaceVariableManager, eventFilterManager, webhookManager } = modules);
         ({ writeDebugOnUnknown } = parameters);
 
         logInfo(`Starting ${PLUGIN_NAME} plugin...`);
@@ -132,6 +134,11 @@ const script: Firebot.CustomScript<{
         logDebug("Registering variables...");
         for (const variable of GitHubVariables) {
             replaceVariableManager.registerReplaceVariable(variable);
+        }
+
+        logDebug("Registering filters...");
+        for (const filter of GitHubFilters) {
+            eventFilterManager.registerFilter(filter);
         }
 
         logDebug("Registering frontend listener...");
