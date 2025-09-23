@@ -55,6 +55,7 @@ const processWebhook = ({ config, headers, payload }: { config: WebhookConfig, h
 }
 
 const triggerWebhookEvent = ({ eventData }: { eventData: GitHubEventData }) => {
+    logDebug(`Triggering event ${GITHUB_EVENT_SOURCE_ID}:${eventData.type}`);
     eventManager.triggerEvent(GITHUB_EVENT_SOURCE_ID, eventData.type, eventData);
 }
 
