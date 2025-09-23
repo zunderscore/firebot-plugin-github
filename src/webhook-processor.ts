@@ -3,12 +3,14 @@ import { components } from "@octokit/openapi-webhooks-types";
 import {
     GitHubEventData,
     GitHubUnknownEventData,
+    GitHubAuthor,
     GitHubOrganization,
     GitHubPullRequest,
     GitHubRelease,
     GitHubRepo,
     GitHubUser,
     GitHubWebhook,
+    GitHubCommit,
 } from "./github-types";
 
 import {
@@ -66,6 +68,31 @@ function getPullRequestInfo(pr: components["schemas"]["pull-request"]): GitHubPu
     };
 }
 
+function getAuthorInfo(pusher: components["schemas"]["webhook-push"]["pusher"]): GitHubAuthor {
+    return {
+        username: pusher?.username,
+        name: pusher?.name,
+        email: pusher?.email,
+        date: pusher?.date ? new Date(pusher.date) : undefined
+    };
+}
+
+function getCommitInfo(
+    commit: components["schemas"]["webhook-push"]["head_commit"]
+): GitHubCommit {
+    return {
+        message: commit?.message,
+        id: commit?.id,
+        treeId: commit?.tree_id,
+        timestamp: commit?.timestamp ? new Date(commit.timestamp) : undefined,
+        author: getAuthorInfo(commit?.author),
+        committer: getAuthorInfo(commit?.committer),
+        added: commit?.added,
+        modified: commit?.modified,
+        removed: commit?.removed,
+    }
+}
+
 function getReleaseInfo(release: components["schemas"]["webhooks_release"]): GitHubRelease {
     return {
         version: release?.tag_name,
@@ -75,7 +102,8 @@ function getReleaseInfo(release: components["schemas"]["webhooks_release"]): Git
 
 function getRepoInfo(
     repo: components["schemas"]["repository"]
-    | components["schemas"]["webhook-push"]["repository"]): GitHubRepo {
+        | components["schemas"]["webhook-push"]["repository"]
+): GitHubRepo {
     return {
         name: repo?.name,
         fullName: repo?.full_name,
@@ -151,6 +179,25 @@ export const githubEventHandler = createEventHandler({
                             pullRequest: getPullRequestInfo(event.payload.pull_request)
                         };
                         break;
+                }
+                break;
+
+            case "push":
+                eventData = {
+                    type: "push",
+                    user: getUserInfo(event.payload.sender),
+                    org: getOrganizationInfo(event.payload.organization),
+                    repo: getRepoInfo(event.payload.repository),
+                    pusher: getAuthorInfo(event.payload.pusher),
+                    previousCommit: event.payload.before,
+                    newCommit: event.payload.after,
+                    compareUrl: event.payload.compare,
+                    ref: event.payload.ref,
+                    createdRef: event.payload.created,
+                    deletedRef: event.payload.deleted,
+                    forced: event.payload.forced,
+                    headCommit: getCommitInfo(event.payload.head_commit),
+                    commits: event.payload.commits.map(getCommitInfo)
                 }
                 break;
 

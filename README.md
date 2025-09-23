@@ -22,6 +22,7 @@ New events:
 - **GitHub: Ping**
 - **GitHub: Pull Request Opened**
 - **GitHub: Pull Request Closed**
+- **GitHub: Push**
 - **GitHub: Release Created**
 - **GitHub: Release Deleted**
 - **GitHub: Release Prereleased**
@@ -45,6 +46,15 @@ New variables:
 - `$githubPullRequestNumber`
 - `$githubPullRequestTitle`
 - `$githubPullRequestUrl`
+- `$githubPushCompareUrl`
+- `$githubPushFilesAdded`
+- `$githubPushFilesModified`
+- `$githubPushFilesRemoved`
+- `$githubPushMessage`
+- `$githubPushNewCommit`
+- `$githubPushPreviousCommit`
+- `$githubPushRef`
+- `$githubPushWasForced`
 - `$githubReleaseUrl`
 - `$githubReleaseVersion`
 - `$githubRepoForks`

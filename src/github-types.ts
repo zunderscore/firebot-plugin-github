@@ -4,6 +4,7 @@ export type GitHubEventType =
     | "ping"
     | "pull-request-opened"
     | "pull-request-closed"
+    | "push"
     | "release-created"
     | "release-deleted"
     | "release-published"
@@ -15,6 +16,25 @@ export type GitHubEventType =
 
 export type GitHubBaseEventData = {
     type: GitHubEventType;
+}
+
+export type GitHubAuthor = {
+    username: string;
+    name: string;
+    email: string;
+    date: Date;
+}
+
+export type GitHubCommit = {
+    message: string;
+    id: string;
+    treeId: string;
+    timestamp: Date;
+    author: GitHubAuthor;
+    committer: GitHubAuthor;
+    added: string[];
+    modified: string[];
+    removed: string[];
 }
 
 export type GitHubMergeBase = {
@@ -112,6 +132,25 @@ type GitHubPullRequestClosedEventData = GitHubPullRequestEventData & {
     type: "pull-request-closed";
 }
 
+// Push
+
+export type GitHubPushEventData = GitHubBaseEventData & {
+    type: "push";
+    user: GitHubUser;
+    org: GitHubOrganization;
+    repo: GitHubRepo;
+    pusher: GitHubAuthor;
+    previousCommit: string;
+    newCommit: string;
+    compareUrl: string;
+    ref: string;
+    createdRef: boolean;
+    deletedRef: boolean;
+    forced: boolean;
+    headCommit: GitHubCommit;
+    commits: GitHubCommit[];
+}
+
 // Releases
 
 export type GitHubReleaseEventData = GitHubBaseEventData & {
@@ -169,6 +208,7 @@ export type GitHubEventData =
     | GitHubPingEventData
     | GitHubPullRequestOpenedEventData
     | GitHubPullRequestClosedEventData
+    | GitHubPushEventData
     | GitHubReleaseCreatedEventData
     | GitHubReleaseDeletedEventData
     | GitHubReleasePrereleasedEventData

@@ -3,11 +3,15 @@ export const PLUGIN_ID = "github";
 export const VARIABLE_PREFIX = PLUGIN_ID;
 export const FILTER_PREFIX = PLUGIN_ID;
 
+// Events
+
 export const GITHUB_EVENT_SOURCE_ID = PLUGIN_ID;
 
 export const GITHUB_FORKED_EVENT_ID = "forked";
 
 export const GITHUB_PING_EVENT_ID = "ping";
+
+export const GITHUB_PUSH_EVENT_ID = "ping";
 
 export const GITHUB_PULL_REQUEST_OPENED_EVENT_ID = "pull-request-opened";
 export const GITHUB_PULL_REQUEST_CLOSED_EVENT_ID = "pull-request-closed";
