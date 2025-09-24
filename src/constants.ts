@@ -11,7 +11,7 @@ export const GITHUB_FORKED_EVENT_ID = "forked";
 
 export const GITHUB_PING_EVENT_ID = "ping";
 
-export const GITHUB_PUSH_EVENT_ID = "ping";
+export const GITHUB_PUSH_EVENT_ID = "push";
 
 export const GITHUB_PULL_REQUEST_OPENED_EVENT_ID = "pull-request-opened";
 export const GITHUB_PULL_REQUEST_CLOSED_EVENT_ID = "pull-request-closed";
