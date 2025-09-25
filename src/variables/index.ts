@@ -1,4 +1,5 @@
 import { ForkVariables } from "./forks";
+import { IssueVariables } from "./issues";
 import { OrganizationVariables } from "./orgs";
 import { PullRequestVariables } from "./pull-requests";
 import { PushVariables } from "./pushes";
@@ -10,6 +11,7 @@ import { WebhookVariables } from "./webhooks";
 
 export const GitHubVariables = [
     ...ForkVariables,
+    ...IssueVariables,
     ...OrganizationVariables,
     ...PullRequestVariables,
     ...PushVariables,

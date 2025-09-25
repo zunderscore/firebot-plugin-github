@@ -1,6 +1,8 @@
 export type GitHubEventType = 
     | "unknown"
     | "forked"
+    | "issue-closed"
+    | "issue-opened"
     | "ping"
     | "pull-request-opened"
     | "pull-request-closed"
@@ -35,6 +37,34 @@ export type GitHubCommit = {
     added: string[];
     modified: string[];
     removed: string[];
+}
+
+export type GitHubIssue = {
+    id: number;
+    type: GitHubIssueType;
+    state: "open" | "closed";
+    title: string;
+    body: string;
+    labels: GitHubLabel[];
+    url: string;
+    createdAt: Date;
+    closedAt: Date;
+}
+
+export type GitHubIssueType = {
+    id: number;
+    name: string;
+    description: string;
+    color: string;
+    enabled: boolean;
+}
+
+export type GitHubLabel = {
+    id: number;
+    name: string;
+    description: string;
+    color: string;
+    default: boolean;
 }
 
 export type GitHubMergeBase = {
@@ -97,17 +127,34 @@ export type GitHubWebhook = {
 // Forks
 
 type GitHubForkedEventData = GitHubBaseEventData & {
-    type: "forked",
+    type: "forked";
     user: GitHubUser;
     org: GitHubOrganization;
     repo: GitHubRepo;
     forkedRepo: GitHubRepo;
 }
 
+// Issues
+
+type GitHubIssueEventData = GitHubBaseEventData & {
+    user: GitHubUser;
+    org: GitHubOrganization;
+    repo: GitHubRepo;
+    issue: GitHubIssue;
+}
+
+type GitHubIssueClosedEventData = GitHubIssueEventData & {
+    type: "issue-closed";
+}
+
+type GitHubIssueOpenedEventData = GitHubIssueEventData & {
+    type: "issue-opened";
+}
+
 // Ping
 
 type GitHubPingEventData = GitHubBaseEventData & {
-    type: "ping",
+    type: "ping";
     user: GitHubUser;
     org: GitHubOrganization;
     repo: GitHubRepo;
@@ -117,7 +164,7 @@ type GitHubPingEventData = GitHubBaseEventData & {
 
 // Pull Requests
 
-export type GitHubPullRequestEventData = GitHubBaseEventData & {
+type GitHubPullRequestEventData = GitHubBaseEventData & {
     user: GitHubUser;
     org: GitHubOrganization;
     repo: GitHubRepo;
@@ -205,6 +252,8 @@ export type GitHubUnknownEventData = {
 export type GitHubEventData = 
     | GitHubUnknownEventData
     | GitHubForkedEventData
+    | GitHubIssueClosedEventData
+    | GitHubIssueOpenedEventData
     | GitHubPingEventData
     | GitHubPullRequestOpenedEventData
     | GitHubPullRequestClosedEventData

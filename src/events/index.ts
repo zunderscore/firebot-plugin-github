@@ -13,6 +13,8 @@ import {
     GITHUB_RELEASE_PUBLISHED_EVENT_ID,
     GITHUB_RELEASE_RELEASED_EVENT_ID,
     GITHUB_STARRED_EVENT_ID,
+    GITHUB_ISSUE_OPENED_EVENT_ID,
+    GITHUB_ISSUE_CLOSED_EVENT_ID,
 } from "../constants";
 
 export const GitHubEventSource: EventSource = {
@@ -24,6 +26,18 @@ export const GitHubEventSource: EventSource = {
             id: GITHUB_FORKED_EVENT_ID,
             name: `${PLUGIN_NAME}: Repo Forked`,
             description: "A GitHub repo was forked"
+        },
+
+        // Issues
+        {
+            id: GITHUB_ISSUE_OPENED_EVENT_ID,
+            name: `${PLUGIN_NAME}: Issue Opened`,
+            description: "A GitHub issue was opened"
+        },
+        {
+            id: GITHUB_ISSUE_CLOSED_EVENT_ID,
+            name: `${PLUGIN_NAME}: Issue Closed`,
+            description: "A GitHub issue was closed"
         },
 
         // PING?
@@ -82,6 +96,13 @@ export const GitHubEventSource: EventSource = {
     ]
 }
 
+export function getAllEvents(): string[] {
+    return GitHubEventSource.events.reduce((out, e) => {
+        out.push(`${GITHUB_EVENT_SOURCE_ID}:${e.id}`);
+        return out;
+    }, [] as string[]);
+}
+
 export function getEventsMatchingPrefix(prefix: string): string[] {
     return GitHubEventSource.events.reduce((out, e) => {
         if (e.id.startsWith(prefix)) {
@@ -89,14 +110,4 @@ export function getEventsMatchingPrefix(prefix: string): string[] {
         }
         return out;
     }, [] as string[]);
-}
-
-
-export function getEventFiltersMatchingPrefix(prefix: string): FilterEvent[] {
-    return GitHubEventSource.events.reduce((out, e) => {
-        if (e.id.startsWith(prefix)) {
-            out.push({ eventSourceId: GITHUB_EVENT_SOURCE_ID, eventId: e.id });
-        }
-        return out;
-    }, [] as FilterEvent[]);
 }

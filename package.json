@@ -1,7 +1,7 @@
 {
   "name": "firebot-plugin-github",
   "scriptOutputName": "firebot-github",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A GitHub plugin for Firebot",
   "main": "",
   "scripts": {

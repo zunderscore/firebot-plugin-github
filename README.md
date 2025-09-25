@@ -19,6 +19,8 @@ This plugin adds support for GitHub events and related variables to Firebot.
 ## Events
 
 New events:
+- **GitHub: Issue Opened**
+- **GitHub: Issue Closed**
 - **GitHub: Ping**
 - **GitHub: Pull Request Opened**
 - **GitHub: Pull Request Closed**
@@ -37,6 +39,12 @@ New variables:
 - `$githubForkRepoFullName`
 - `$githubForkRepoName`
 - `$githubForkRepoUrl`
+- `$githubIssueBody`
+- `$githubIssueId`
+- `$githubIssueState`
+- `$githubIssueTitle`
+- `$githubIssueType`
+- `$githubIssueUrl`
 - `$githubOrgAvatarUrl`
 - `$githubOrgDescription`
 - `$githubOrgName`

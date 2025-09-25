@@ -1,6 +1,6 @@
 import { EventFilter } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-filter-manager";
 import { FILTER_PREFIX } from "../constants";
-import { getEventFiltersMatchingPrefix } from "../events";
+import { getAllEventFilters } from "../filters";
 import { GitHubRepo } from "../github-types";
 
 export const RepoNameFilter: EventFilter = {
@@ -8,7 +8,7 @@ export const RepoNameFilter: EventFilter = {
     name: "GitHub Repo Name",
     description: "The short name of the GitHub repo, like \"Firebot\"",
     events: [
-        ...getEventFiltersMatchingPrefix("") // Everything
+        ...getAllEventFilters()
     ],
     comparisonTypes: [ "is", "is not" ],
     valueType: "text",

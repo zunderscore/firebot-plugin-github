@@ -4,18 +4,24 @@ import {
     GitHubEventData,
     GitHubUnknownEventData,
     GitHubAuthor,
+    GitHubCommit,
+    GitHubIssue,
     GitHubOrganization,
     GitHubPullRequest,
     GitHubRelease,
     GitHubRepo,
     GitHubUser,
     GitHubWebhook,
-    GitHubCommit,
 } from "./github-types";
 
 import {
+    GITHUB_FORKED_EVENT_ID,
+    GITHUB_ISSUE_OPENED_EVENT_ID,
+    GITHUB_ISSUE_CLOSED_EVENT_ID,
+    GITHUB_PING_EVENT_ID,
     GITHUB_PULL_REQUEST_OPENED_EVENT_ID,
     GITHUB_PULL_REQUEST_CLOSED_EVENT_ID,
+    GITHUB_PUSH_EVENT_ID,
     GITHUB_RELEASE_CREATED_EVENT_ID,
     GITHUB_RELEASE_DELETED_EVENT_ID,
     GITHUB_RELEASE_PRERELEASED_EVENT_ID,
@@ -93,6 +99,35 @@ function getCommitInfo(
     }
 }
 
+function getIssueInfo(issue: components["schemas"][
+        "webhook-issues-opened" | "webhook-issues-closed"
+    ]["issue"]
+): GitHubIssue {
+    return {
+        id: issue?.id,
+        state: issue?.state,
+        type: issue?.type ? {
+            id: issue.type.id,
+            name: issue.type.name,
+            description: issue.type.description,
+            color: issue.type.color,
+            enabled: issue.type.is_enabled
+        } : undefined,
+        title: issue?.title,
+        body: issue?.body,
+        labels: issue?.labels?.map(l => ({
+            id: l.id,
+            name: l.name,
+            description: l.description,
+            color: l.color,
+            default: l.default
+        })),
+        url: issue?.html_url,
+        createdAt: issue?.created_at ? new Date(issue.created_at) : undefined,
+        closedAt: issue?.closed_at ? new Date(issue.closed_at) : undefined
+    };
+}
+
 function getReleaseInfo(release: components["schemas"]["webhooks_release"]): GitHubRelease {
     return {
         version: release?.tag_name,
@@ -139,7 +174,7 @@ export const githubEventHandler = createEventHandler({
         switch (event.name) {
             case "fork":
                 eventData = {
-                    type: "forked",
+                    type: GITHUB_FORKED_EVENT_ID,
                     user: getUserInfo(event.payload.sender),
                     org: getOrganizationInfo(event.payload.organization),
                     repo: getRepoInfo(event.payload.repository),
@@ -147,9 +182,33 @@ export const githubEventHandler = createEventHandler({
                 };
                 break;
 
+            case "issues":
+                eventData = {
+                    user: getUserInfo(event.payload.sender),
+                    org: getOrganizationInfo(event.payload.organization),
+                    repo: getRepoInfo(event.payload.repository),
+                }
+                switch (event.payload.action) {
+                    case "opened":
+                        eventData = {
+                            ...eventData,
+                            type: GITHUB_ISSUE_OPENED_EVENT_ID,
+                            issue: getIssueInfo(event.payload.issue)
+                        }
+                        break;
+                    case "closed":
+                        eventData = {
+                            ...eventData,
+                            type: GITHUB_ISSUE_CLOSED_EVENT_ID,
+                            issue: getIssueInfo(event.payload.issue)
+                        }
+                        break;
+                }
+                break;
+
             case "ping":
                 eventData = {
-                    type: "ping",
+                    type: GITHUB_PING_EVENT_ID,
                     user: getUserInfo(event.payload.sender),
                     org: getOrganizationInfo(event.payload.organization),
                     repo: getRepoInfo(event.payload.repository),
@@ -184,7 +243,7 @@ export const githubEventHandler = createEventHandler({
 
             case "push":
                 eventData = {
-                    type: "push",
+                    type: GITHUB_PUSH_EVENT_ID,
                     user: getUserInfo(event.payload.sender),
                     org: getOrganizationInfo(event.payload.organization),
                     repo: getRepoInfo(event.payload.repository),
@@ -247,6 +306,8 @@ export const githubEventHandler = createEventHandler({
 
 export const githubEvents: EmitterWebhookEventName[] = [
     "fork",
+    "issues.opened",
+    "issues.closed",
     "ping",
     "pull_request.closed",
     "pull_request.opened",

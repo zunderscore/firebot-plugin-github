@@ -1,22 +1,22 @@
 import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
-import { GitHubRepo } from "../../github-types";
+import { GitHubIssue } from "../../github-types";
 import { VARIABLE_PREFIX } from "../../constants";
-import { getAllEvents } from "../../events";
+import { getEventsMatchingPrefix } from "../../events";
 
-export const RepoStarsVariable: ReplaceVariable = {
+export const IssueIdVariable: ReplaceVariable = {
     definition: {
-        handle: `${VARIABLE_PREFIX}RepoStars`,
-        description: "The number of times the GitHub repo has been starred.",
+        handle: `${VARIABLE_PREFIX}IssueId`,
+        description: "The ID of the GitHub issue.",
         possibleDataOutput: [ "number" ],
         categories: [ "trigger based" ],
         triggers: {
             event: [
-                ...getAllEvents()
+                ...getEventsMatchingPrefix("issue-")
             ],
             manual: true
         }
     },
     evaluator: async (trigger) => {
-        return (trigger.metadata?.eventData?.repo as GitHubRepo)?.stars ?? 0;
+        return (trigger.metadata?.eventData?.issue as GitHubIssue)?.id ?? 0;
     }
 };
