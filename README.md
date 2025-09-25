@@ -1,6 +1,6 @@
 # GitHub Plugin for Firebot
 
-This plugin adds support for GitHub events and related variables to Firebot.
+This plugin adds support for GitHub events and related variables to [Firebot](https://firebot.app).
 
 ## Prerequisites
 - Firebot 5.65 or higher
