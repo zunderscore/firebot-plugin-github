@@ -26,3 +26,6 @@ export const GITHUB_RELEASE_PUBLISHED_EVENT_ID = "release-published";
 export const GITHUB_RELEASE_RELEASED_EVENT_ID = "release-released";
 
 export const GITHUB_STARRED_EVENT_ID = "starred";
+
+export const GITHUB_WORKFLOW_RUN_REQUESTED_EVENT_ID = "workflow-run-requested";
+export const GITHUB_WORKFLOW_RUN_COMPLETED_EVENT_ID = "workflow-run-completed";

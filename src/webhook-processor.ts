@@ -12,6 +12,8 @@ import {
     GitHubRepo,
     GitHubUser,
     GitHubWebhook,
+    GitHubWorkflow,
+    GitHubWorkflowRun,
 } from "./github-types";
 
 import {
@@ -28,6 +30,8 @@ import {
     GITHUB_RELEASE_PUBLISHED_EVENT_ID,
     GITHUB_RELEASE_RELEASED_EVENT_ID,
     GITHUB_STARRED_EVENT_ID,
+    GITHUB_WORKFLOW_RUN_REQUESTED_EVENT_ID,
+    GITHUB_WORKFLOW_RUN_COMPLETED_EVENT_ID,
 } from "./constants";
 
 function createUnknownEvent(event: any): GitHubUnknownEventData {
@@ -84,15 +88,15 @@ function getAuthorInfo(pusher: components["schemas"]["webhook-push"]["pusher"]):
 }
 
 function getCommitInfo(
-    commit: components["schemas"]["webhook-push"]["head_commit"]
+    commit: Partial<components["schemas"]["webhook-push"]["head_commit"]>
 ): GitHubCommit {
     return {
         message: commit?.message,
         id: commit?.id,
         treeId: commit?.tree_id,
         timestamp: commit?.timestamp ? new Date(commit.timestamp) : undefined,
-        author: getAuthorInfo(commit?.author),
-        committer: getAuthorInfo(commit?.committer),
+        author: commit?.author ? getAuthorInfo(commit.author) : undefined,
+        committer: commit?.committer ? getAuthorInfo(commit.committer) : undefined,
         added: commit?.added,
         modified: commit?.modified,
         removed: commit?.removed,
@@ -165,6 +169,37 @@ function getWebhookInfo(hook: components["schemas"]["webhook-ping"]["hook"]): Gi
         active: hook?.active,
         events: hook?.events
     };
+}
+
+function getWorkflowInfo(
+    workflow: components["schemas"][
+        "webhook-workflow-run-requested" | "webhook-workflow-run-completed"
+    ]["workflow"]
+): GitHubWorkflow {
+    return {
+        id: workflow?.id,
+        name: workflow?.name,
+        state: workflow?.state,
+        url: workflow?.html_url,
+        badgeUrl: workflow?.badge_url
+    }
+}
+
+function getWorkflowRunInfo(
+    run: components["schemas"][
+        "webhook-workflow-run-requested" | "webhook-workflow-run-completed"
+    ]["workflow_run"]
+): GitHubWorkflowRun {
+    return {
+        id: run?.id,
+        name: run?.name,
+        headCommit: run?.head_commit ? getCommitInfo(run?.head_commit) : undefined,
+        status: run?.status,
+        runNumber: run?.run_number,
+        runAttempt: run?.run_attempt,
+        conclusion: run?.conclusion,
+        url: run?.html_url
+    }
 }
 
 export const githubEventHandler = createEventHandler({
@@ -298,6 +333,31 @@ export const githubEventHandler = createEventHandler({
                         eventData.type = GITHUB_STARRED_EVENT_ID;
                         break;
                 }
+
+            case "workflow_run":
+                eventData = {
+                    user: getUserInfo(event.payload.sender),
+                    org: getOrganizationInfo(event.payload.organization),
+                    repo: getRepoInfo(event.payload.repository),
+                };
+                switch (event.payload.action) {
+                    case "requested":
+                        eventData = {
+                            ...eventData,
+                            type: GITHUB_WORKFLOW_RUN_REQUESTED_EVENT_ID,
+                            workflow: getWorkflowInfo(event.payload.workflow),
+                            workflowRun: getWorkflowRunInfo(event.payload.workflow_run)
+                        }
+                        break;
+                    case "completed":
+                        eventData = {
+                            ...eventData,
+                            type: GITHUB_WORKFLOW_RUN_COMPLETED_EVENT_ID,
+                            workflow: getWorkflowInfo(event.payload.workflow),
+                            workflowRun: getWorkflowRunInfo(event.payload.workflow_run)
+                        }
+                        break;
+                }
         }
 
         return { eventData: eventData as GitHubEventData };
@@ -316,5 +376,7 @@ export const githubEvents: EmitterWebhookEventName[] = [
     "release.prereleased",
     "release.published",
     "release.released",
-    "star.created"
+    "star.created",
+    "workflow_run.completed",
+    "workflow_run.requested"
 ]

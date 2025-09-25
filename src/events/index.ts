@@ -15,6 +15,8 @@ import {
     GITHUB_STARRED_EVENT_ID,
     GITHUB_ISSUE_OPENED_EVENT_ID,
     GITHUB_ISSUE_CLOSED_EVENT_ID,
+    GITHUB_WORKFLOW_RUN_REQUESTED_EVENT_ID,
+    GITHUB_WORKFLOW_RUN_COMPLETED_EVENT_ID,
 } from "../constants";
 
 export const GitHubEventSource: EventSource = {
@@ -92,6 +94,18 @@ export const GitHubEventSource: EventSource = {
             id: GITHUB_STARRED_EVENT_ID,
             name: `${PLUGIN_NAME}: Repo Starred`,
             description: "When someone stars a GitHub repo"
+        },
+        
+        // Workflow Runs
+        {
+            id: GITHUB_WORKFLOW_RUN_REQUESTED_EVENT_ID,
+            name: `${PLUGIN_NAME}: Workflow Run Requested`,
+            description: "When a GitHub workflow run is requested"
+        },
+        {
+            id: GITHUB_WORKFLOW_RUN_COMPLETED_EVENT_ID,
+            name: `${PLUGIN_NAME}: Workflow Run Completed`,
+            description: "When a GitHub workflow run is completed"
         },
     ]
 }

@@ -8,6 +8,8 @@ import { RepoVariables } from "./repos";
 import { StarVariables } from "./stars";
 import { UserVariables } from "./users";
 import { WebhookVariables } from "./webhooks";
+import { WorkflowRunVariables } from "./workflow-runs";
+import { WorkflowVariables } from "./workflows";
 
 export const GitHubVariables = [
     ...ForkVariables,
@@ -19,5 +21,7 @@ export const GitHubVariables = [
     ...RepoVariables,
     ...StarVariables,
     ...UserVariables,
-    ...WebhookVariables
+    ...WebhookVariables,
+    ...WorkflowRunVariables,
+    ...WorkflowVariables
 ];

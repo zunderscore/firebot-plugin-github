@@ -13,6 +13,8 @@ export type GitHubEventType =
     | "release-prereleased"
     | "release-released"
     | "starred"
+    | "workflow-run-requested"
+    | "workflow-run-completed"
 
 // Shared Types
 
@@ -122,6 +124,25 @@ export type GitHubWebhook = {
     name: string;
     active: boolean;
     events: string[];
+}
+
+export type GitHubWorkflow = {
+    id: number;
+    name: string;
+    state: string;
+    url: string;
+    badgeUrl: string;
+}
+
+export type GitHubWorkflowRun = {
+    id: number;
+    name: string;
+    headCommit: GitHubCommit;
+    status: "requested" | "in_progress" | "completed" | "queued" | "pending" | "waiting";
+    runNumber: number;
+    runAttempt: number;
+    conclusion: "success" | "failure" | "neutral" | "cancelled" | "timed_out" | "action_required" | "stale" | "skipped" | "startup_failure";
+    url: string;
 }
 
 // Forks
@@ -240,6 +261,24 @@ type GitHubStarCreatedEventData = GitHubStar & {
     type: "starred";
 }
 
+// Workflow Runs
+
+type GitHubWorkflowRunEventData = GitHubBaseEventData & {
+    user: GitHubUser;
+    org: GitHubOrganization;
+    repo: GitHubRepo;
+    workflow: GitHubWorkflow;
+    workflowRun: GitHubWorkflowRun;
+}
+
+type GitHubWorkflowRunRequestedEventData = GitHubWorkflowRunEventData & {
+    type: "workflow-run-requested";
+}
+
+type GitHubWorkflowRunCompletedEventData = GitHubWorkflowRunEventData & {
+    type: "workflow-run-completed";
+}
+
 // Unknown event
 
 export type GitHubUnknownEventData = {
@@ -264,3 +303,5 @@ export type GitHubEventData =
     | GitHubReleasePublishedEventData
     | GitHubReleaseReleasedEventData
     | GitHubStarCreatedEventData
+    | GitHubWorkflowRunRequestedEventData
+    | GitHubWorkflowRunCompletedEventData

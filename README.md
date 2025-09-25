@@ -32,6 +32,8 @@ New events:
 - **GitHub: Release Released**
 - **GitHub: Repo Forked**
 - **GitHub: Repo Starred**
+- **GitHub: Workflow Run Requested**
+- **GitHub: Workflow Run Completed**
 
 ## Variables
 
@@ -80,3 +82,13 @@ New variables:
 - `$githubWebhookId`
 - `$githubWebhookIsActive`
 - `$githubWebhookName`
+- `$githubWorkflowBadgeUrl`
+- `$githubWorkflowId`
+- `$githubWorkflowName`
+- `$githubWorkflowState`
+- `$githubWorkflowUrl`
+- `$githubWorkflowRunConclusion`
+- `$githubWorkflowRunId`
+- `$githubWorkflowRunName`
+- `$githubWorkflowRunStatus`
+- `$githubWorkflowRunUrl`
