@@ -5,27 +5,27 @@ export const FILTER_PREFIX = PLUGIN_ID;
 
 // Events
 
-export const GITHUB_EVENT_SOURCE_ID = PLUGIN_ID;
+export const EVENT_SOURCE_ID = PLUGIN_ID;
 
-export const GITHUB_FORKED_EVENT_ID = "forked";
+export const FORKED_EVENT_ID = "forked";
 
-export const GITHUB_ISSUE_OPENED_EVENT_ID = "issue-opened";
-export const GITHUB_ISSUE_CLOSED_EVENT_ID = "issue-closed";
+export const ISSUE_OPENED_EVENT_ID = "issue-opened";
+export const ISSUE_CLOSED_EVENT_ID = "issue-closed";
 
-export const GITHUB_PING_EVENT_ID = "ping";
+export const PING_EVENT_ID = "ping";
 
-export const GITHUB_PUSH_EVENT_ID = "push";
+export const PUSH_EVENT_ID = "push";
 
-export const GITHUB_PULL_REQUEST_OPENED_EVENT_ID = "pull-request-opened";
-export const GITHUB_PULL_REQUEST_CLOSED_EVENT_ID = "pull-request-closed";
+export const PULL_REQUEST_OPENED_EVENT_ID = "pull-request-opened";
+export const PULL_REQUEST_CLOSED_EVENT_ID = "pull-request-closed";
 
-export const GITHUB_RELEASE_CREATED_EVENT_ID = "release-created";
-export const GITHUB_RELEASE_DELETED_EVENT_ID = "release-deleted";
-export const GITHUB_RELEASE_PRERELEASED_EVENT_ID = "release-prereleased";
-export const GITHUB_RELEASE_PUBLISHED_EVENT_ID = "release-published";
-export const GITHUB_RELEASE_RELEASED_EVENT_ID = "release-released";
+export const RELEASE_CREATED_EVENT_ID = "release-created";
+export const RELEASE_DELETED_EVENT_ID = "release-deleted";
+export const RELEASE_PRERELEASED_EVENT_ID = "release-prereleased";
+export const RELEASE_PUBLISHED_EVENT_ID = "release-published";
+export const RELEASE_RELEASED_EVENT_ID = "release-released";
 
-export const GITHUB_STARRED_EVENT_ID = "starred";
+export const STARRED_EVENT_ID = "starred";
 
-export const GITHUB_WORKFLOW_RUN_REQUESTED_EVENT_ID = "workflow-run-requested";
-export const GITHUB_WORKFLOW_RUN_COMPLETED_EVENT_ID = "workflow-run-completed";
+export const WORKFLOW_RUN_REQUESTED_EVENT_ID = "workflow-run-requested";
+export const WORKFLOW_RUN_COMPLETED_EVENT_ID = "workflow-run-completed";

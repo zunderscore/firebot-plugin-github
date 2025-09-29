@@ -2,8 +2,8 @@ import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/type
 import { GitHubWebhook } from "../../github-types";
 import {
     VARIABLE_PREFIX,
-    GITHUB_EVENT_SOURCE_ID,
-    GITHUB_PING_EVENT_ID,
+    EVENT_SOURCE_ID,
+    PING_EVENT_ID,
 } from "../../constants";
 
 export const WebhookEventsVariable: ReplaceVariable = {
@@ -14,7 +14,7 @@ export const WebhookEventsVariable: ReplaceVariable = {
         categories: [ "trigger based", "advanced" ],
         triggers: {
             event: [
-                `${GITHUB_EVENT_SOURCE_ID}:${GITHUB_PING_EVENT_ID}`
+                `${EVENT_SOURCE_ID}:${PING_EVENT_ID}`
             ],
             manual: true
         }

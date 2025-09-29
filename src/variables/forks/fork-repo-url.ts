@@ -1,8 +1,8 @@
 import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
 import { GitHubRepo } from "../../github-types";
 import {
-    GITHUB_EVENT_SOURCE_ID,
-    GITHUB_FORKED_EVENT_ID,
+    EVENT_SOURCE_ID,
+    FORKED_EVENT_ID,
     VARIABLE_PREFIX,
 } from "../../constants";
 
@@ -14,7 +14,7 @@ export const ForkRepoUrlVariable: ReplaceVariable = {
         categories: [ "trigger based" ],
         triggers: {
             event: [
-                `${GITHUB_EVENT_SOURCE_ID}:${GITHUB_FORKED_EVENT_ID}`
+                `${EVENT_SOURCE_ID}:${FORKED_EVENT_ID}`
             ],
             manual: true
         }

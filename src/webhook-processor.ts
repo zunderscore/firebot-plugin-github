@@ -17,21 +17,21 @@ import {
 } from "./github-types";
 
 import {
-    GITHUB_FORKED_EVENT_ID,
-    GITHUB_ISSUE_OPENED_EVENT_ID,
-    GITHUB_ISSUE_CLOSED_EVENT_ID,
-    GITHUB_PING_EVENT_ID,
-    GITHUB_PULL_REQUEST_OPENED_EVENT_ID,
-    GITHUB_PULL_REQUEST_CLOSED_EVENT_ID,
-    GITHUB_PUSH_EVENT_ID,
-    GITHUB_RELEASE_CREATED_EVENT_ID,
-    GITHUB_RELEASE_DELETED_EVENT_ID,
-    GITHUB_RELEASE_PRERELEASED_EVENT_ID,
-    GITHUB_RELEASE_PUBLISHED_EVENT_ID,
-    GITHUB_RELEASE_RELEASED_EVENT_ID,
-    GITHUB_STARRED_EVENT_ID,
-    GITHUB_WORKFLOW_RUN_REQUESTED_EVENT_ID,
-    GITHUB_WORKFLOW_RUN_COMPLETED_EVENT_ID,
+    FORKED_EVENT_ID,
+    ISSUE_OPENED_EVENT_ID,
+    ISSUE_CLOSED_EVENT_ID,
+    PING_EVENT_ID,
+    PULL_REQUEST_OPENED_EVENT_ID,
+    PULL_REQUEST_CLOSED_EVENT_ID,
+    PUSH_EVENT_ID,
+    RELEASE_CREATED_EVENT_ID,
+    RELEASE_DELETED_EVENT_ID,
+    RELEASE_PRERELEASED_EVENT_ID,
+    RELEASE_PUBLISHED_EVENT_ID,
+    RELEASE_RELEASED_EVENT_ID,
+    STARRED_EVENT_ID,
+    WORKFLOW_RUN_REQUESTED_EVENT_ID,
+    WORKFLOW_RUN_COMPLETED_EVENT_ID,
 } from "./constants";
 
 function createUnknownEvent(event: any): GitHubUnknownEventData {
@@ -209,7 +209,7 @@ export const githubEventHandler = createEventHandler({
         switch (event.name) {
             case "fork":
                 eventData = {
-                    type: GITHUB_FORKED_EVENT_ID,
+                    type: FORKED_EVENT_ID,
                     user: getUserInfo(event.payload.sender),
                     org: getOrganizationInfo(event.payload.organization),
                     repo: getRepoInfo(event.payload.repository),
@@ -227,14 +227,14 @@ export const githubEventHandler = createEventHandler({
                     case "opened":
                         eventData = {
                             ...eventData,
-                            type: GITHUB_ISSUE_OPENED_EVENT_ID,
+                            type: ISSUE_OPENED_EVENT_ID,
                             issue: getIssueInfo(event.payload.issue)
                         }
                         break;
                     case "closed":
                         eventData = {
                             ...eventData,
-                            type: GITHUB_ISSUE_CLOSED_EVENT_ID,
+                            type: ISSUE_CLOSED_EVENT_ID,
                             issue: getIssueInfo(event.payload.issue)
                         }
                         break;
@@ -243,7 +243,7 @@ export const githubEventHandler = createEventHandler({
 
             case "ping":
                 eventData = {
-                    type: GITHUB_PING_EVENT_ID,
+                    type: PING_EVENT_ID,
                     user: getUserInfo(event.payload.sender),
                     org: getOrganizationInfo(event.payload.organization),
                     repo: getRepoInfo(event.payload.repository),
@@ -262,14 +262,14 @@ export const githubEventHandler = createEventHandler({
                     case "opened":
                         eventData = {
                             ...eventData,
-                            type: GITHUB_PULL_REQUEST_OPENED_EVENT_ID,
+                            type: PULL_REQUEST_OPENED_EVENT_ID,
                             pullRequest: getPullRequestInfo(event.payload.pull_request)
                         };
                         break;
                     case "closed":
                         eventData = {
                             ...eventData,
-                            type: GITHUB_PULL_REQUEST_CLOSED_EVENT_ID,
+                            type: PULL_REQUEST_CLOSED_EVENT_ID,
                             pullRequest: getPullRequestInfo(event.payload.pull_request)
                         };
                         break;
@@ -278,7 +278,7 @@ export const githubEventHandler = createEventHandler({
 
             case "push":
                 eventData = {
-                    type: GITHUB_PUSH_EVENT_ID,
+                    type: PUSH_EVENT_ID,
                     user: getUserInfo(event.payload.sender),
                     org: getOrganizationInfo(event.payload.organization),
                     repo: getRepoInfo(event.payload.repository),
@@ -304,19 +304,19 @@ export const githubEventHandler = createEventHandler({
                 }
                 switch (event.payload.action){
                     case "created":
-                        eventData.type = GITHUB_RELEASE_CREATED_EVENT_ID;
+                        eventData.type = RELEASE_CREATED_EVENT_ID;
                         break;
                     case "deleted":
-                        eventData.type = GITHUB_RELEASE_DELETED_EVENT_ID;
+                        eventData.type = RELEASE_DELETED_EVENT_ID;
                         break;
                     case "prereleased":
-                        eventData.type = GITHUB_RELEASE_PRERELEASED_EVENT_ID;
+                        eventData.type = RELEASE_PRERELEASED_EVENT_ID;
                         break;
                     case "published":
-                        eventData.type = GITHUB_RELEASE_PUBLISHED_EVENT_ID;
+                        eventData.type = RELEASE_PUBLISHED_EVENT_ID;
                         break;
                     case "released": 
-                        eventData.type = GITHUB_RELEASE_RELEASED_EVENT_ID;
+                        eventData.type = RELEASE_RELEASED_EVENT_ID;
                         break;
                 }
                 break;
@@ -330,7 +330,7 @@ export const githubEventHandler = createEventHandler({
                 };
                 switch (event.payload.action) {
                     case "created":
-                        eventData.type = GITHUB_STARRED_EVENT_ID;
+                        eventData.type = STARRED_EVENT_ID;
                         break;
                 }
 
@@ -344,7 +344,7 @@ export const githubEventHandler = createEventHandler({
                     case "requested":
                         eventData = {
                             ...eventData,
-                            type: GITHUB_WORKFLOW_RUN_REQUESTED_EVENT_ID,
+                            type: WORKFLOW_RUN_REQUESTED_EVENT_ID,
                             workflow: getWorkflowInfo(event.payload.workflow),
                             workflowRun: getWorkflowRunInfo(event.payload.workflow_run)
                         }
@@ -352,7 +352,7 @@ export const githubEventHandler = createEventHandler({
                     case "completed":
                         eventData = {
                             ...eventData,
-                            type: GITHUB_WORKFLOW_RUN_COMPLETED_EVENT_ID,
+                            type: WORKFLOW_RUN_COMPLETED_EVENT_ID,
                             workflow: getWorkflowInfo(event.payload.workflow),
                             workflowRun: getWorkflowRunInfo(event.payload.workflow_run)
                         }

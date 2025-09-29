@@ -1,8 +1,8 @@
 import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
 import {
     VARIABLE_PREFIX,
-    GITHUB_EVENT_SOURCE_ID,
-    GITHUB_STARRED_EVENT_ID,
+    EVENT_SOURCE_ID,
+    STARRED_EVENT_ID,
 } from "../../constants";
 
 export const StarredAtVariable: ReplaceVariable = {
@@ -13,7 +13,7 @@ export const StarredAtVariable: ReplaceVariable = {
         categories: [ "trigger based" ],
         triggers: {
             event: [
-                `${GITHUB_EVENT_SOURCE_ID}:${GITHUB_STARRED_EVENT_ID}`
+                `${EVENT_SOURCE_ID}:${STARRED_EVENT_ID}`
             ],
             manual: true
         }

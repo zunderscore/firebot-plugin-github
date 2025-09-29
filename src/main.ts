@@ -17,7 +17,7 @@ import { GitHubFilters } from "./filters";
 import {
     PLUGIN_ID,
     PLUGIN_NAME,
-    GITHUB_EVENT_SOURCE_ID
+    EVENT_SOURCE_ID
 } from "./constants";
 
 const packageInfo = require("../package.json");
@@ -60,8 +60,8 @@ const processWebhook = ({ config, headers, payload }: { config: WebhookConfig, h
 }
 
 const triggerWebhookEvent = ({ eventData }: { eventData: GitHubEventData }) => {
-    logDebug(`Triggering event ${GITHUB_EVENT_SOURCE_ID}:${eventData.type}`);
-    eventManager.triggerEvent(GITHUB_EVENT_SOURCE_ID, eventData.type, eventData);
+    logDebug(`Triggering event ${EVENT_SOURCE_ID}:${eventData.type}`);
+    eventManager.triggerEvent(EVENT_SOURCE_ID, eventData.type, eventData);
 }
 
 function setupWebhookListeners() {
@@ -201,7 +201,7 @@ const script: Firebot.CustomScript<{
         }
 
         logDebug("Unregistering events...");
-        eventManager.unregisterEventSource(GITHUB_EVENT_SOURCE_ID);
+        eventManager.unregisterEventSource(EVENT_SOURCE_ID);
 
         if (uninstalling === true) {
             logDebug("Removing webhook...");
