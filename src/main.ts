@@ -1,10 +1,5 @@
-import { Firebot } from "@crowbartools/firebot-custom-scripts-types";
-import { Logger } from "@crowbartools/firebot-custom-scripts-types/types/modules/logger";
-import { EventManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-manager";
-import { ReplaceVariableManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
-import { EventFilterManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-filter-manager";
-import { FrontendCommunicator } from "@crowbartools/firebot-custom-scripts-types/types/modules/frontend-communicator";
-import { WebhookConfig, WebhookManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/webhook-manager";
+import { Firebot, ScriptModules } from "@crowbartools/firebot-custom-scripts-types";
+import { WebhookConfig } from "@crowbartools/firebot-custom-scripts-types/types/modules/webhook-manager";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
 
 import { GitHubEventData } from "./github-types";
@@ -22,12 +17,12 @@ import {
 
 const packageInfo = require("../package.json");
 
-let logger: Logger;
-let eventManager: EventManager;
-let replaceVariableManager: ReplaceVariableManager;
-let eventFilterManager: EventFilterManager;
-let frontendCommunicator: FrontendCommunicator;
-let webhookManager: WebhookManager;
+let logger: ScriptModules["logger"];
+let eventManager: ScriptModules["eventManager"];
+let replaceVariableManager: ScriptModules["replaceVariableManager"];
+let eventFilterManager: ScriptModules["eventFilterManager"];
+let frontendCommunicator: ScriptModules["frontendCommunicator"];
+let webhookManager: ScriptModules["webhookManager"];
 
 let writeDebugOnUnknown = false;
 let copyWebhookUrlEventId: string = undefined;
