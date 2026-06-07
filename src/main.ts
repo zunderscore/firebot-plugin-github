@@ -1,5 +1,4 @@
-import { Firebot, ScriptModules } from "@crowbartools/firebot-custom-scripts-types";
-import { WebhookConfig } from "@crowbartools/firebot-custom-scripts-types/types/modules/webhook-manager";
+import firebot, { Plugin, PluginWebhookEventHandler } from "@crowbartools/firebot-types";
 import { EmitterWebhookEvent } from "@octokit/webhooks";
 
 import { GitHubEventData } from "./github-types";
@@ -17,59 +16,48 @@ import {
 
 const packageInfo = require("../package.json");
 
-let logger: ScriptModules["logger"];
-let eventManager: ScriptModules["eventManager"];
-let replaceVariableManager: ScriptModules["replaceVariableManager"];
-let eventFilterManager: ScriptModules["eventFilterManager"];
-let frontendCommunicator: ScriptModules["frontendCommunicator"];
-let webhookManager: ScriptModules["webhookManager"];
-
 let writeDebugOnUnknown = false;
-let copyWebhookUrlEventId: string = undefined;
 
-const logDebug = (msg: string, ...meta: any[]) => logger.debug(`[${PLUGIN_NAME}] ${msg}`, ...meta);
-const logInfo = (msg: string, ...meta: any[]) => logger.info(`[${PLUGIN_NAME}] ${msg}`, ...meta);
-const logWarn = (msg: string, ...meta: any[]) => logger.warn(`[${PLUGIN_NAME}] ${msg}`, ...meta);
-const logError = (msg: string, ...meta: any[]) => logger.error(`[${PLUGIN_NAME}] ${msg}`, ...meta);
-
-const processWebhook = ({ config, headers, payload }: { config: WebhookConfig, headers: Record<string, string>, payload: any }) => {
-    logDebug(`Got webhook for ${config.name}`);
-    if (config.name !== PLUGIN_NAME) {
-        logDebug(`Received unknown webhook event for ${config.name}. Ignoring.`);
+const processWebhook: PluginWebhookEventHandler = ({ webhook, headers, payload }) => {
+    firebot.logger.debug(`Got webhook for ${webhook.name}`);
+    if (webhook.name !== PLUGIN_NAME) {
+        firebot.logger.debug(`Received unknown webhook event for ${webhook.name}. Ignoring.`);
         return;
     }
 
+    const githubPayload = payload as any;
+
     const eventName = headers["x-github-event"].replace("_", "-");
     let fullEventName = eventName;
-    if (payload.action) {
-        fullEventName = `${eventName}-${payload.action}`;
+    if (githubPayload.action) {
+        fullEventName = `${eventName}-${githubPayload.action}`;
     }
 
-    logDebug(`Webhook type: ${fullEventName}`);
+    firebot.logger.debug(`Webhook type: ${fullEventName}`);
 
     githubEventHandler.receive({
         id: headers["x-github-delivery"],
         name: headers["x-github-event"] as any,
-        payload
+        payload: githubPayload
     });
 }
 
 const triggerWebhookEvent = ({ eventData }: { eventData: GitHubEventData }) => {
-    logDebug(`Triggering event ${EVENT_SOURCE_ID}:${eventData.type}`);
-    eventManager.triggerEvent(EVENT_SOURCE_ID, eventData.type, eventData);
+    firebot.logger.debug(`Triggering event ${EVENT_SOURCE_ID}:${eventData.type}`);
+    firebot.events.trigger(EVENT_SOURCE_ID, eventData.type, eventData);
 }
 
 function setupWebhookListeners() {
     for (const event of githubEvents) {
-        logDebug(`Registering webhook event ${event}`);
+        firebot.logger.debug(`Registering webhook event ${event}`);
         githubEventHandler.on(event, triggerWebhookEvent);
     }
 
     githubEventHandler.onAny((event: EmitterWebhookEvent & { eventData: GitHubEventData }) => {
         if (event.eventData.type == "unknown") {
-            logWarn(`Unknown event type received. Skipping.`);
+            firebot.logger.warn(`Unknown event type received. Skipping.`);
             if (writeDebugOnUnknown) {
-                logDebug("Unknown event data", event.eventData.rawData);
+                firebot.logger.debug("Unknown event data", event.eventData.rawData);
             }
         }
     })
@@ -77,137 +65,70 @@ function setupWebhookListeners() {
 
 function removeWebhookListeners() {
     for (const event of githubEvents) {
-        logDebug(`Unregistering webhook event ${event}`);
+        firebot.logger.debug(`Unregistering webhook event ${event}`);
         githubEventHandler.removeListener(event, triggerWebhookEvent);
     }
 }
 
-const script: Firebot.CustomScript<{
+const plugin: Plugin<{
     copyWebhookUrl: void;
     writeDebugOnUnknown: boolean;
 }> = {
-    getScriptManifest: () => ({
+    manifest: {
+        type: "plugin",
         name: PLUGIN_NAME,
         description: packageInfo.description,
         author: packageInfo.author,
         version: packageInfo.version,
-        firebotVersion: "5",
-        startupOnly: true,
+        repo: "https://github.com/zunderscore/firebot-plugin-github",
+        icon: {
+            type: "custom",
+            url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJkAAACWCAMAAAD61NpdAAAAP1BMVEVHcEz///////////////////////////////////////////////////////////////////////////////9KjZoYAAAAFHRSTlMA8w/6Bul4ZDMbUsdC35i41ImoJr889TkAAAbTSURBVHjazVxto7IgDBWQdxFR/v9vfaqnW1nKhoC1z/fWaWxjO2zruiKhWhkRZm8nTliMkRE3WT8GOSy0774kPVUyzJO7IXoXxp2dhVno6bAuqEbLtzC9CnE2mOVE3dEheB6Rwtws1SngeiUsGtZduJdLa1xazrmw7pobh5Y2t4iJxaNCvNSNcKngYpEw2wTbUorrJvWxaTHFOmJlTXuj0sZqwvxQLYiomcSawkOdGEKFi7XFmr6GwlisL2QsVVsvXWwjdihzyZHEVsJFgZMqHxsKGw/HNjPFtmLVj5nYU5w5AkyQ2F6czA4fNJwB7BI+RCY0OrIYfxEaHeNpkgXtTGBZ0HrB4rnQfsorV9eBxCGTZwPDxrXBxfNlQtwGi43fEA/eodTH78gIZB59+BKwyAAHNeRbyCJPppLLXt7D53H21pXhJs76y+fs0Q82YWr9vPehob8SZosRnh9ViRdXtu/yObsGM/b5keypaarCAW6DWKEeFj7s/Thiss8yWrrigzIDC/Pm9aDo/tfsnGe/f4+/6VmvS1BGuLvSs1exdnKckxRfsG8zN6PZ8st9ExJ7VShxfhRyUFrTP9F6GYwM850s3agsRaZ/JmLshgFQwck0i0HTfdZbBs+30mm5f/Dz1sdJlvVTejNoMK+iSuUFTbKRdeiEWXPV1ZQhEXn8p9JS2aJbTkPGJD5iXJHVJQpVKlp/RI5kgu3oecjelaaTwfNMnb1bmkzeOCfa2bvSgHyR10UGpFq+x/8tH6oiSx/Q6tt6oPIlpioyAWQA4SVkQOWSqAkM0kOcFqx6kzndAbIcSqKePtCD9dKkTwsat3v9TxEKrH2dOi1orKKUhCuumqcJEzp/x5nIMVNZU4GheeRxgp7p6iZBCPO5H6dhZ8aMm0BMwD2AhjMdE5NA/AVb8NTrqwyOoLeEAzIz16KhYZkQXwqRLGOTdoGAMDRx6m2ODbcCjma2TZMFdHlebmroT0Kj7g/gqCyFHICZRsgGArkAcOCuVasR4J2XxBZg/22rPiMg9SISOu+xayUj5Jzj+RcAygXGDribTDNkQCLhu3TQYEMzZEMame0AF1HNkAHlwNS5H0XmOvKjyEjHfhYZkGl8DVkEkH3PNyFkLeNZLEP2tTsgduRH703SAXboWzWDQzQP775ROWGYAQfcTu1yWogZmKBco1kdADEDvoOIoEZJLcgfzJCLtKo3wSaHsROncrQPz4SOigm4P8mpL1ya1woFZk1DfaXBrTSXqk6DTbMNlAbT205jWpSqWxoFmeErgdbDPY28tnsieu+u2gA59+p80ILoupYw9dHgdQc+y0iuGatG/AIiK/olpvP0xlr3iJ9Q09RQDZ7/nyoE4i+jq1UQGFSDp0C+UF1vi0mdCIz814PGDShMFQ60l7jGur/HEWTX5YFe/nevxLb2j9iM5E/HoSyuoQeUHom0xs6bMF9gbFSix1qeD+n4Jlon9GGF4RtLn4F9wP8Ts+ZA+t1nzVi+pNFbrxWMO7c5PE18LrY+cyb19Zr+CLZuNGpZlBndpt5Exii3NnNm97xIlKXPoTe1Pb/mZomZgu8XM2a3364z1XG3Xup3JsWY88Go/VbH696B4N2BuZEx8ai37lBSu6Uh49O8F0cMPOKfvJkemlkrzZtFY6Bdgi/dTXYOdnjPffIllHH7MjKr9mJkaiAIe0emVbbV4MSebtDvtCezZMF3bDhp7hHPx8/Epw+bqyoCLU6rQZVtd4U9u262aj8GjY7A3TMYlW22xLxEj09Tg4Eh0+X9qPD4GLbd0HGPAjwfGKp+Q7B1G5TW66mv82Tk/HHmKNC0oDmt10JzeEGOHXVXWZFjt3jccILVu5MW9oadWPR6gLzBrv0+t43JtfUlpgcphBwyssccH0iVZ58RtfSxLiMpTRMBoTalkeGdaWfXvjJvQNETSBaw3c+IWkhRYW8omJ74NLUynnasYWQ7XE0ZRYWLtQzz8z/zCl4CTRRGspXRfhwAL2A0UMg8MnLrD6st2NIhKrhlKnYcX6UjymL/R3z8vO74vF55tehayPI4ww1okdwKzOu04aLkOMlKyHLJTD1vL6mb7EUmcmfsKyDL35hCA4PfEsqR+QPv9BQoZWsgY/OhBgJgxUwFZCQcDUaDbYqsJIAviR1LxcjK9j/R/RMtRFa+M2vwrAUyV2F13N7+sxJkZK7zVrRNmBcgm6rt2qPGsnrIai2zu19Wn7sOkJWL/DjIoXLDgH7bf4ktRNcFJ5lNgz6ji95Yfh36yh+QudXyUG0eiz/wN/Fjy0/bpab9ECxnxOW8Jw7+8h/ciuZbavVgMvf0UmWMOn/vcDP5B0/RM1wztth2AAAAAElFTkSuQmCC",
+            backgroundColor: "#000000"
+        },
+        minimumFirebotVersion: { major: 5, minor: 67 },
         initBeforeShowingParams: true
-    }),
-    getDefaultParameters: () => ({
-        copyWebhookUrl: {
+    },
+    parametersSchema: [
+        {
+            name: "copyWebhookUrl",
             type: "button",
             title: "Webhook URL",
             description: "Copy this URL then go to your GitHub repo settings. Under Settings > Webhooks, create a new webhook, paste the copied URL into the **Payload URL** field, select which events you want GitHub to send for that repo, and click \"Add webhook\".",
             backendEventName: `${PLUGIN_ID}:copy-webhook-url`,
-            buttonText: "Copy URL",
-            icon: "fa-copy",
-            sync: true
+            buttonText: "Copy URL"
         },
-        writeDebugOnUnknown: {
+        {
+            name: "writeDebugOnUnknown",
             type: "boolean",
             title: "Log Raw Data for Unknown Events",
             description: "When an unknown event is received, log the raw data received from the GitHub event. Firebot debug logs must be enabled for this to take effect.",
             default: false
         }
-    }),
-    parametersUpdated: (params) => {
-        ({ writeDebugOnUnknown } = params);
+    ],
+    registers: {
+        eventSources: [GitHubEventSource],
+        variables: GitHubVariables,
+        filters: GitHubFilters,
+        webhooks: {
+            handler: processWebhook,
+            webhookNames: [
+                PLUGIN_NAME
+            ]
+        }
     },
-    run: ({ modules, parameters }) => {
-        ({
-            logger,
-            eventManager,
-            replaceVariableManager,
-            eventFilterManager,
-            frontendCommunicator,
-            webhookManager
-        } = modules);
-        ({ writeDebugOnUnknown } = parameters);
-
-        logInfo(`Starting ${PLUGIN_NAME} plugin...`);
-
-        if (webhookManager == null) {
-            logError(`Cannot start ${PLUGIN_NAME} plugin. You must be on Firebot 5.65 or higher.`);
-            return;
-        }
-
-        logDebug("Registering events...");
-        eventManager.registerEventSource(GitHubEventSource);
-
-        logDebug("Registering variables...");
-        for (const variable of GitHubVariables) {
-            replaceVariableManager.registerReplaceVariable(variable);
-        }
-
-        logDebug("Registering filters...");
-        for (const filter of GitHubFilters) {
-            eventFilterManager.registerFilter(filter);
-        }
-
-        logDebug("Registering frontend listener...");
-        copyWebhookUrlEventId = frontendCommunicator.on(`${PLUGIN_ID}:copy-webhook-url`, () => {
-            frontendCommunicator.send("copy-to-clipboard", { 
-                text: webhookManager.getWebhookUrl(PLUGIN_NAME),
+    onLoad: () => {
+        firebot.frontendCommunicator.on(`${PLUGIN_ID}:copy-webhook-url`, () => {
+            firebot.frontendCommunicator.send("copy-to-clipboard", {
+                text: firebot.webhooks.getUrl(PLUGIN_NAME),
             });
         });
-        
 
-        logDebug("Registering webhook listener...");
         setupWebhookListeners();
-        webhookManager.on("webhook-received", processWebhook);
-
-        logDebug("Checking for webhook...");
-        let webhook = webhookManager.getWebhook(PLUGIN_NAME);
-
-        if (webhook == null) {
-            logDebug("Webhook not found. Registering...");
-
-            webhook = webhookManager.saveWebhook(PLUGIN_NAME);
-        }
-
-        if (webhook == null) {
-            logError("Something went wrong while registering webhook. Exiting.");
-            return;
-        }
-
-        logDebug("Webhook registered");
-        logInfo("Plugin ready. Listening for events.");
     },
-    stop: (uninstalling: boolean) => {
-        logDebug(`Stopping ${PLUGIN_NAME} plugin...`);
-
-        logDebug("Stopping webhook listener...");
-        webhookManager.removeListener("webhook-received", processWebhook);
+    onUnload: () => {
         removeWebhookListeners();
-
-        logDebug("Unregistering frontend listener...");
-        frontendCommunicator.off(`${PLUGIN_ID}:copy-webhook-url`, copyWebhookUrlEventId);
-
-        logDebug("Unregistering filters...");
-        for (const filter of GitHubFilters) {
-            eventFilterManager.unregisterFilter(filter.id);
-        }
-
-        logDebug("Unregistering variables...");
-        for (const variable of GitHubVariables) {
-            replaceVariableManager.unregisterReplaceVariable(variable.definition.handle);
-        }
-
-        logDebug("Unregistering events...");
-        eventManager.unregisterEventSource(EVENT_SOURCE_ID);
-
-        if (uninstalling === true) {
-            logDebug("Removing webhook...");
-
-            webhookManager.deleteWebhook(PLUGIN_NAME);
-
-            logInfo("Plugin uninstalled");
-        } else {
-            logInfo("Plugin stopped");
-        }
     }
 }
 
-export default script;
+export default plugin;

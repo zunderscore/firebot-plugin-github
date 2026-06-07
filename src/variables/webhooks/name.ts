@@ -1,4 +1,4 @@
-import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
+import type { ReplaceVariable } from "@crowbartools/firebot-types";
 import { GitHubWebhook } from "../../github-types";
 import {
     VARIABLE_PREFIX,
@@ -10,8 +10,8 @@ export const WebhookNameVariable: ReplaceVariable = {
     definition: {
         handle: `${VARIABLE_PREFIX}WebhookName`,
         description: "The GitHub webhook name.",
-        possibleDataOutput: [ "text" ],
-        categories: [ "trigger based", "advanced" ],
+        possibleDataOutput: ["text"],
+        categories: ["trigger based", "advanced"],
         triggers: {
             event: [
                 `${EVENT_SOURCE_ID}:${PING_EVENT_ID}`

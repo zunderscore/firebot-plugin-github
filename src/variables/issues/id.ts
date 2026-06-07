@@ -1,4 +1,4 @@
-import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
+import type { ReplaceVariable } from "@crowbartools/firebot-types";
 import { GitHubIssue } from "../../github-types";
 import { VARIABLE_PREFIX } from "../../constants";
 import { getEventsMatchingPrefix } from "../../events";
@@ -7,8 +7,8 @@ export const IssueIdVariable: ReplaceVariable = {
     definition: {
         handle: `${VARIABLE_PREFIX}IssueId`,
         description: "The ID of the GitHub issue.",
-        possibleDataOutput: [ "number" ],
-        categories: [ "trigger based" ],
+        possibleDataOutput: ["number"],
+        categories: ["trigger based"],
         triggers: {
             event: [
                 ...getEventsMatchingPrefix("issue-")

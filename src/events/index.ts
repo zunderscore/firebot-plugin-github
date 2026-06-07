@@ -1,4 +1,4 @@
-import { EventSource } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-manager";
+import type { EventSource } from "@crowbartools/firebot-types";
 import {
     PLUGIN_NAME,
     EVENT_SOURCE_ID,
@@ -94,7 +94,7 @@ export const GitHubEventSource: EventSource = {
             name: `${PLUGIN_NAME}: Repo Starred`,
             description: "When someone stars a GitHub repo"
         },
-        
+
         // Workflow Runs
         {
             id: WORKFLOW_RUN_REQUESTED_EVENT_ID,

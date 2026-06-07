@@ -1,4 +1,4 @@
-import { ReplaceVariable } from "@crowbartools/firebot-custom-scripts-types/types/modules/replace-variable-manager";
+import type { ReplaceVariable } from "@crowbartools/firebot-types";
 import { GitHubPushEventData } from "../../github-types";
 import {
     VARIABLE_PREFIX,
@@ -10,8 +10,8 @@ export const PushFilesAddedVariable: ReplaceVariable = {
     definition: {
         handle: `${VARIABLE_PREFIX}PushFilesAdded`,
         description: "An array of files added via the GitHub push's head commit.",
-        possibleDataOutput: [ "array" ],
-        categories: [ "trigger based", "advanced" ],
+        possibleDataOutput: ["array"],
+        categories: ["trigger based", "advanced"],
         triggers: {
             event: [
                 `${EVENT_SOURCE_ID}:${PUSH_EVENT_ID}`

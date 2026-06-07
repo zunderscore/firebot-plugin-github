@@ -1,4 +1,4 @@
-import { FilterEvent } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-filter-manager";
+import type { EventSourceAndId } from "@crowbartools/firebot-types";
 import { GitHubEventSource } from "../events";
 import { EVENT_SOURCE_ID } from "../constants";
 import { RepoFullNameFilter } from "./repo-full-name";
@@ -9,18 +9,18 @@ export const GitHubFilters = [
     RepoNameFilter
 ]
 
-export function getAllEventFilters(): FilterEvent[] {
+export function getAllEventFilters(): EventSourceAndId[] {
     return GitHubEventSource.events.reduce((out, e) => {
         out.push({ eventSourceId: EVENT_SOURCE_ID, eventId: e.id });
         return out;
-    }, [] as FilterEvent[]);
+    }, [] as EventSourceAndId[]);
 }
 
-export function getEventFiltersMatchingPrefix(prefix: string): FilterEvent[] {
+export function getEventFiltersMatchingPrefix(prefix: string): EventSourceAndId[] {
     return GitHubEventSource.events.reduce((out, e) => {
         if (e.id.startsWith(prefix)) {
             out.push({ eventSourceId: EVENT_SOURCE_ID, eventId: e.id });
         }
         return out;
-    }, [] as FilterEvent[]);
+    }, [] as EventSourceAndId[]);
 }
