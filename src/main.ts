@@ -75,7 +75,6 @@ const plugin: Plugin<{
     writeDebugOnUnknown: boolean;
 }> = {
     manifest: {
-        type: "plugin",
         name: PLUGIN_NAME,
         description: packageInfo.description,
         author: packageInfo.author,
