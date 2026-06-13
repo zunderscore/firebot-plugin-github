@@ -114,15 +114,19 @@ const plugin: Plugin<{
             webhookNames: [
                 PLUGIN_NAME
             ]
-        }
+        },
+        frontendListeners: [
+            {
+                eventName: `${PLUGIN_ID}:copy-webhook-url`,
+                handler: () => {
+                    firebot.frontendCommunicator.send("copy-to-clipboard", {
+                        text: firebot.webhooks.getUrl(PLUGIN_NAME),
+                    });
+                }
+            }
+        ]
     },
     onLoad: () => {
-        firebot.frontendCommunicator.on(`${PLUGIN_ID}:copy-webhook-url`, () => {
-            firebot.frontendCommunicator.send("copy-to-clipboard", {
-                text: firebot.webhooks.getUrl(PLUGIN_NAME),
-            });
-        });
-
         setupWebhookListeners();
     },
     onUnload: () => {
