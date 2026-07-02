@@ -104,8 +104,8 @@ function getCommitInfo(
 }
 
 function getIssueInfo(issue: components["schemas"][
-        "webhook-issues-opened" | "webhook-issues-closed"
-    ]["issue"]
+    "webhook-issues-opened" | "webhook-issues-closed"
+]["issue"]
 ): GitHubIssue {
     return {
         id: issue?.id,
@@ -205,7 +205,7 @@ function getWorkflowRunInfo(
 export const githubEventHandler = createEventHandler({
     async transform(event): Promise<{ eventData: GitHubEventData }> {
         let eventData: Partial<GitHubEventData> = createUnknownEvent(event);
-        
+
         switch (event.name) {
             case "fork":
                 eventData = {
@@ -291,7 +291,7 @@ export const githubEventHandler = createEventHandler({
                     deletedRef: event.payload.deleted,
                     forced: event.payload.forced,
                     headCommit: getCommitInfo(event.payload.head_commit),
-                    commits: event.payload.commits.map(getCommitInfo)
+                    commits: event.payload.commits?.map(getCommitInfo)
                 }
                 break;
 
@@ -302,7 +302,7 @@ export const githubEventHandler = createEventHandler({
                     repo: getRepoInfo(event.payload.repository),
                     release: getReleaseInfo(event.payload.release)
                 }
-                switch (event.payload.action){
+                switch (event.payload.action) {
                     case "created":
                         eventData.type = RELEASE_CREATED_EVENT_ID;
                         break;
@@ -315,12 +315,12 @@ export const githubEventHandler = createEventHandler({
                     case "published":
                         eventData.type = RELEASE_PUBLISHED_EVENT_ID;
                         break;
-                    case "released": 
+                    case "released":
                         eventData.type = RELEASE_RELEASED_EVENT_ID;
                         break;
                 }
                 break;
-            
+
             case "star":
                 eventData = {
                     user: getUserInfo(event.payload.sender),
