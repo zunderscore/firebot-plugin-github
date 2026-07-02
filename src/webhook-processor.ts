@@ -291,7 +291,7 @@ export const githubEventHandler = createEventHandler({
                     deletedRef: event.payload.deleted,
                     forced: event.payload.forced,
                     headCommit: getCommitInfo(event.payload.head_commit),
-                    commits: event.payload.commits.map(getCommitInfo)
+                    commits: event.payload.commits?.map(getCommitInfo)
                 }
                 break;
 

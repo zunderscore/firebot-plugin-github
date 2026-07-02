@@ -2,6 +2,7 @@ import type { EventSource } from "@crowbartools/firebot-types";
 import {
     PLUGIN_NAME,
     EVENT_SOURCE_ID,
+    PUSH_EVENT_ID,
     FORKED_EVENT_ID,
     PING_EVENT_ID,
     PULL_REQUEST_OPENED_EVENT_ID,
@@ -22,6 +23,13 @@ export const GitHubEventSource: EventSource = {
     id: EVENT_SOURCE_ID,
     name: PLUGIN_NAME,
     events: [
+        // Pushes
+        {
+            id: PUSH_EVENT_ID,
+            name: `${PLUGIN_NAME}: Push`,
+            description: "A commit was pushed to a GitHub repo"
+        },
+
         // Forks
         {
             id: FORKED_EVENT_ID,
