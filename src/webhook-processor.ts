@@ -368,6 +368,7 @@ export const githubEvents: EmitterWebhookEventName[] = [
     "fork",
     "issues.opened",
     "issues.closed",
+    "push",
     "ping",
     "pull_request.closed",
     "pull_request.opened",
